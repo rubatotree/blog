@@ -8,9 +8,9 @@ on:
         required: true
         default: blog-toolchain-linux-amd64
       hugo_ref:
-        description: Vertsineu/hugo branch, tag, or ref to build.
+        description: rubatotree/hugo branch, tag, or ref to build.
         required: true
-        default: support-typst
+        default: master
       typst_version:
         description: typst-cli release version to install.
         required: true
@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          git clone --depth 1 --branch "$HUGO_REF" "https://github.com/Vertsineu/hugo.git" "$RUNNER_TEMP/custom-hugo"
+          git clone --depth 1 --branch "$HUGO_REF" "https://github.com/rubatotree/hugo-typst.git" "$RUNNER_TEMP/custom-hugo"
           cd "$RUNNER_TEMP/custom-hugo"
 
           mkdir -p "$RUNNER_TEMP/toolchain/bin"

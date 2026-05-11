@@ -172,6 +172,13 @@
   let src = if type(it.source) == str { it.source } else {
     panic("unsupported image source type for HTML output, please use a string!")
   }
+  src = if src.starts-with("/blog/") or src.starts-with("http://") or src.starts-with("https://") {
+    src
+  } else if src.starts-with("/") {
+    "/blog" + src
+  } else {
+    src
+  }
 
   html.img(src: src, alt: alt, loading: "lazy")
 }
