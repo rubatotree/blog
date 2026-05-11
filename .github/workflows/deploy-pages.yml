@@ -53,7 +53,7 @@ jobs:
 
       - name: Build site
         run: |
-          hugo --gc --minify
+          hugo --gc --minify --baseURL "https://rubatotree.github.io/blog/"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
