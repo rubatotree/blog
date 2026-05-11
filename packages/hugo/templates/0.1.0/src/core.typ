@@ -12,7 +12,7 @@
   // outline(title: none)
   toc: true,
   // set text(lang: lang, region: region)
-  lang: "zh",
+  lang: "en",
   region: "cn",
   // bibliography(bytes(references.text), full: true)
   references: none,
