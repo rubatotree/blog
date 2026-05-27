@@ -95,6 +95,7 @@
   }
 
   if references != none {
-    bibliography(bytes(references.text), full: true)
+    set text(lang: "en", region: "us")
+    bibliography(bytes(references.text), full: true, title: "References")
   }
 }
