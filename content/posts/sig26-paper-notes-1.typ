@@ -29,6 +29,23 @@
   primaryClass = {cs.CV},
   url          = {https://arxiv.org/abs/2603.23637}
 }
+@inproceedings{mcnerf,
+author = {Gupta, Kunal and Hasan, Milos and Xu, Zexiang and Luan, Fujun and Sunkavalli, Kalyan and Sun, Xin and Chandraker, Manmohan and Bi, Sai},
+title = {MCNeRF: Monte Carlo Rendering and Denoising for Real-Time NeRFs},
+year = {2023},
+isbn = {9798400703157},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3610548.3618221},
+doi = {10.1145/3610548.3618221},
+abstract = {The volume rendering step used in Neural Radiance Fields (NeRFs) produces highly photorealistic results, but is inherently slow because it evaluates an MLP at a large number of sample points per ray. Previous work has addressed this by either proposing neural scene representations that are faster to evaluate or by pre-computing (and approximating) scene properties to reduce render times. In this work, we propose MCNeRF, a general Monte Carlo-based rendering algorithm that can speed up any NeRF representation. We show that the NeRF volume rendering integral can be efficiently computed via Monte Carlo integration using an importance sampling scheme based on ray density distributions. This allows us to use a small number of MLP evaluations to estimate pixel radiance. These noisy Monte Carlo estimates can be further denoised using an inexpensive image-space denoiser trained per-scene. We demonstrate that MCNeRF can be used to speed up NeRF representations like TensoRF by 7 \texttimes{} while closely matching their visual quality and without making the scene approximations that real-time NeRF rendering methods usually make.},
+booktitle = {SIGGRAPH Asia 2023 Conference Papers},
+articleno = {98},
+numpages = {11},
+keywords = {Monte Carlo Rendering, Neural Radiance Fields, Neural Rendering, Real-Time NeRF},
+location = {Sydney, NSW, Australia},
+series = {SA '23}
+}
 @misc{niedermayr2025lightweightgradientawareupscaling3d,
   title={Lightweight Gradient-Aware Upscaling of 3D Gaussian Splatting Images}, 
   author={Simon Niedermayr and Christoph Neuhauser Rüdiger Westermann},
@@ -160,8 +177,7 @@ keywords = {fabric capture, fabric rendering, fiber-level}
   ```,
 )
 
-WIP
-
+#image("/images/sig26-paper-notes-1/teaser.png")
 = 3D Gaussians
 
 == Gaussian Point Splatting @Rijsdijk2026GaussianPointSplatting [#link("https://jorisar.nl/gaussian_point_splatting/", "Project")]
@@ -171,9 +187,9 @@ WIP
 
 本文注意到单个 Gaussian Splat 到屏幕空间的行为可以等价于在屏幕空间上按一个 Gaussian 分布放回采样 $N$ 个点的结果的期望（$N$ 和 Gaussian 的参数相关）。而一系列 Gaussians 做 Alpha Blending 的行为可以等价于，对每个 Gaussian $G_i$ 采样 $N_i$ 个点，然后对每个像素取深度上最靠前的点 $min_(d^j) c_x^j$ 作为 Splat 结果的无偏估计值。
 
-一方面该方法优化掉了每个 Tile 都要 GPU 排序的瓶颈，优化到了关于 Gaussian 数量的线性复杂度，还可以通过遮挡剔除等方式进一步剪枝。另一方面这个过程还可以高度并行化，取 $min_(d^j) c_x^j$ 的操作也只需要在屏幕空间缓冲区做一个很高效的原子查询+覆盖，因此跑起来就很快。
+一方面该方法优化掉了每个 Tile 都要 GPU 排序的瓶颈，优化到了关于 Gaussian 数量的线性复杂度，还可以通过遮挡剔除等方式进一步剪枝。另一方面这个过程还可以高度并行化，取 $min_(d^j) c_x^j$ 的操作也只需要在屏幕空间缓冲区做一个很高效的原子查询+覆盖，因此跑起来就很快。并且对于超大场景，由于存在大量小于 1 像素的极小 Gaussians，这些 Gaussians 在传统管线中会占用大量的排序计算，造成性能瓶颈，而在该管线中可能只对应非常小的采样点数，因此效率提升会更大。
 
-由于其将深度排序行为替换成了蒙特卡洛方法，它还天然支持渲染出 3DGRT 特有的 “Gaussian 穿插”行为，避免了相机移动时的 Popping 现象。这种 Splatting 方法似乎是可以做到和 3DGRT 管线一致的（3DGRT 管线可能被迫在射线相交的高斯球过多时放弃靠后的高斯球，但这一方面影响不大，另一方面也可以用随机终止 @xu2026Stoch3DGS 代替 Alpha Blending 做到一致无偏）。
+由于其将深度排序行为替换成了蒙特卡洛方法，它还天然支持渲染出 3DGRT 特有的 “Gaussian 穿插”行为，避免了相机移动时的 Popping 现象。这种 Splatting 方法似乎是可以做到和 3DGRT 管线一致的。（3DGRT 管线可能被迫在射线相交的高斯球过多时放弃靠后的高斯球，但这一方面影响不大，另一方面也可以用随机终止 @xu2026Stoch3DGS 代替 Alpha Blending 做到一致无偏）
 
 #figure(
   caption: "Popping 行为和穿插行为",
@@ -185,7 +201,11 @@ WIP
 
 这篇的效率瓶颈主要在原子操作互斥锁、采样 Gaussians 时的显存吞吐、分布本身缺陷造成大 Gaussians 生成过多采样点拖慢效率等。对于这些问题本文都用了一些策略去应对。对于采样过程论文提到计算 CDF 并二分的方法比用别名法要快，每次相机移动都会改变所有 Gaussian 的 $N_i$ 分布的确是个麻烦事。
 
-本文和 Stochastic Ray Tracing for the Reconstruction of 3D Gaussian Splatting @xu2026Stoch3DGS 同属于用 Monte Carlo 概率方法优化 3D Gaussian Primitive 渲染的方法。区别在于后一篇是基于 3DGRT 管线直接用 Monte Carlo 方法代替了 排序 + Alpha Blending 的过程，保持可微，效率瓶颈仍在求交；而该论文提出了一种比较新的 Splatting 方式，不需要求交、排序等操作，但仅支持正向渲染。二者每 spp 的像素颜色分布也有所不同。
+感觉这篇 Monte Carlo 方法的主要缺陷是，对屏幕空间颜色贡献较大的 Gaussian Point 主要是靠近相机的 Gaussian Point，被挡住的 Gaussian Point 实际上的贡献密度很小。感觉缺一点重要性采样，也许可做哇。这个问题在传统 3DGS 管线中也存在。本文的方法主要是靠遮挡剔除解决这个问题的。
+
+本文和 Stochastic Ray Tracing for the Reconstruction of 3D Gaussian Splatting @xu2026Stoch3DGS 同属于用 Monte Carlo 概率方法优化 3D Gaussian Primitive 渲染的方法。区别在于后一篇是基于 3DGRT 管线直接用 Monte Carlo 方法代替了 排序 + Alpha Blending 的过程，保持可微，效率瓶颈仍在求交；而该论文提出了一种比较新的 Splatting 方式，不需要求交、排序等操作，但仅支持正向渲染。二者每 spp 的像素颜色分布也有所不同。这篇的思路中被挡住的 Gaussians 基本就不会被采样到，从而不会影响效率。
+
+在 NeRF 上的类似工作则在 2023 年就有人做过 @mcnerf，大致思路就是考虑到密度估计比颜色估计更快（只用查哈希表），因此先求路径上颜色贡献关于路径的 CDF，然后按该累计分布密度随机采样几个点得到无偏估计，最后做图像空间降噪。这篇的效率提升是传统方法的 7 倍，要低于 Gaussian Point Splatting 的提升倍数，可能深度排序在 3DGS 中还是太耗了。这篇在当年是 Conference Paper。不知道这样改进后密度估计的开销占比有多大。如果要设计基于和 Gaussian Point Splatting 一样的采样-覆写的方法，主要困难是对视锥内的密度场采样。不知道能不能靠预计算做一下。这篇由于是用贡献 CDF 采样颜色，所以天然不易采样到被挡住的点，比较类似 Stochastic 3DGRT。
 
 由于这篇和 Stochastic 3DGRT 一起将随机深度采样的方法变成了最高效的 3D Gaussian Primitives 正向渲染方法，基于低 spp 渲染结果先验的降噪工作可能会变得更加重要。
 
@@ -209,7 +229,35 @@ WIP
 == Lifting Lines and Tone: Image-space Stylization in Path-space @West2026 [#link("http://www.cg.it.aoyama.ac.jp/yonghao/sig26/abstsig26.html", "Project")]
 #image("/images/sig26-paper-notes-1/West2026.png")
 
-TODO
+该工作是 NPR 描线 (Feature Lines) 和半调 (Tones) 在全局光照下的渲染系列最新的工作。
+
+West 的往期工作提到用一个风格化渲染方程 $L_o = g_theta (L_e+integral_Omega L_i rho dif omega_i)$ 来建模 NPR 的行为，其中 $g_theta$ 是一个定义上与屏幕空间坐标相关的风格化函数。该工作优化了对世界空间（路径空间）中的点找到其屏幕空间特征的算法（论文中将该操作称为“Lifting”）。
+
+该文章的设计目标基于以下原则：
+1. Image-space consistency：线条的宽度和半调图案间距在屏幕坐标系下应该稳定可控，需要在间接光、反射/折射（尤其是带曲率表面）、景深等影响下保持一致；
+2. Geometric correctness：从图像空间到路径空间的映射要保持局部几何特征，应该避免曲率造成的失真。
+3. Distribution support：不仅需要支持镜面反射，还要支持任意分布定义的散射。
+4. Estimator compatibility：积分结果需要无偏，且效率上要和传统路径追踪相当。
+
+#figure(
+  caption: "Failure modes（第二排，从左至右）：半调阴影间距沿表面测地线分布而不是在屏幕空间均匀分布；半调图案受表面曲率影响产生偏差；线宽在经过右侧球面反射后发生变化。我其实不太清楚过去工作产生这些 Failure mode 的原因。",
+  image("/images/sig26-paper-notes-1/lifting-failure-cases.png"),
+) <fig-lifting-failure-cases>
+
+对于描线，本文设计的方案（Conditional Lifting）是对于一条光路，做一次“Levi-Civita 平行移动”（就是微分几何的那个平行移动）。实际上就是去求屏幕空间中射线方向的微扰会在路径点上产生怎样的微扰、这种微扰是否会让该路径点有特征线的特征（如微扰后可见性发生了变化，或屏幕空间的微扰会造成路径空间的剧烈变化）。这个思路有种可微渲染感，但论文中实际实现方式是有限差分，用“冻结随机变量”的方法重用每步的采样方向保证差分路径间的强耦合性。
+
+对于半调，本文设计的方案（Canonical Lifting）则是先假设所有表面都是理想镜面、做一遍路径追踪在世界空间打下一系列记有对应屏幕空间坐标的锚点；在实际路径追踪时，对每个路径点去找邻域的锚点，并用移动最小二乘法插值出该路径点的屏幕空间坐标。感觉好 Tricky 啊，这个思路还是得参考艺术家是怎样决定经过光学变换后的半调的。
+
+#figure(
+  caption: "这张图还是很形象地展示了平行移动描线是 make sense 的，这篇工作中带曲率的曲面会影响微扰在下一跳的微分，而以往工作做不到。"+emph[我和我自己比],
+  image("/images/sig26-paper-notes-1/lifting-levi-civita.png"),
+) <fig-lifting-levi-civita>
+
+这篇颇有一种二十年前图形学“看起来对就是对”的 tricky 美感，不像是这个年代能出现在 ToG 的文章（？），不知道还有没有什么别的领域能体验一把这种拿到艺术家对 NPR 的需求并在数学上很好地建模的科研体验。这个系列工作要做的话感觉做不过 West 他们，说实话之前看他们工作的时候都想不出这些问题，就算自己提了新的渲染目标也不一定能把故事讲通，果然这篇只有他们自己能做出来。
+
+这个系列的工作目前基本没有做路径追踪基础上的加速，感觉有机会提炼出一些可 Caching 的东西，能凹到实时就更好了。
+
+NPR 与现代渲染方法结合的话，Neural 方法是难以建模一个相机相关的辐射场的（真的可以力大砖飞加一个相机参数维度吗，说不定呢）；Gaussian Primitives 由于 SH 的低频性质加上描边的特殊性，感觉很难表示描边和半调这种特征。现在做 NeRF/Gaussians 光场的 NPR/ 风格化基本都是用前馈网络做类似后处理的操作实现的，感觉这样做多视角一致性还是个问题，ai 幻觉可能还会有些不适感。
 
 == Fiber-level Woven Fabric Capture from a Single Microscopic Image @FiberLevel
 #image("/images/sig26-paper-notes-1/FiberLevel.png")
