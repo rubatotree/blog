@@ -6,9 +6,7 @@
   date: datetime(year: 2026, month: 5, day: 10),
   weight: 0,
   tags: (
-    platforms: ("hugo", "typst"),
-    domains: "architecture",
-    intents: ("introduction", "enhancement"),
+    category: "漫谈"
   ),
   draft: false,
   references: ```yml

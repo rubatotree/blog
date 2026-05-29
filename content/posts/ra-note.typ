@@ -6,7 +6,7 @@
   date: datetime(year: 2026, month: 5, day: 11),
   weight: 0,
   tags: (
-    category: "数学"
+    category: ("数学", "分析")
   ),
   draft: false,
   references: ```yml

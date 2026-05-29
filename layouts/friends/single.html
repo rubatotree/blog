@@ -1,0 +1,80 @@
+{{- define "main" }}
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+  </header>
+
+  <div class="post-content">
+    {{ .Content }}
+  </div>
+
+  <div class="friends-container">
+    {{ range .Params.friends }}
+    <a href="{{ .url }}" target="_blank" class="friend-card">
+      <img class="friend-avatar"
+           src="{{ if .avatar }}{{ .avatar }}{{ else }}https://github.com/{{ .github }}.png{{ end }}"
+           alt="{{ .name }}"
+           referrerpolicy="no-referrer">
+      <div class="friend-info">
+        <h3 class="friend-name">{{ .name }}</h3>
+        <p class="friend-desc">{{ .description }}</p>
+      </div>
+    </a>
+    {{ end }}
+  </div>
+</article>
+
+<style>
+.friends-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+}
+
+.friend-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: var(--primary);
+}
+
+.friend-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friend-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.friend-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  white-space: pre-line;
+}
+</style>
+
+{{- end }}
