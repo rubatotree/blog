@@ -66,6 +66,24 @@ series = {SA '23}
   numpages = {15},
   doi = {10.1145/3811359}
 }
+@misc{geng2025meanflowsonestepgenerative,
+  title={Mean Flows for One-step Generative Modeling}, 
+  author={Zhengyang Geng and Mingyang Deng and Xingjian Bai and J. Zico Kolter and Kaiming He},
+  year={2025},
+  eprint={2505.13447},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG},
+  url={https://arxiv.org/abs/2505.13447}, 
+}
+@misc{wu2025neuralbrdfimportancesampling,
+      title={Neural BRDF Importance Sampling by Reparameterization}, 
+      author={Liwen Wu and Sai Bi and Zexiang Xu and Hao Tan and Kai Zhang and Fujun Luan and Haolin Lu and Ravi Ramamoorthi},
+      year={2025},
+      eprint={2505.08998},
+      archivePrefix={arXiv},
+      primaryClass={cs.GR},
+      url={https://arxiv.org/abs/2505.08998}, 
+}
 @article{FiberLevel,
 author = {Li, Zixuan and Shen, Pengfei and Sun, Hanxiao and Zhang, Zibo and Guo, Yu and Liu, Ligang and Yan, Lingqi and Marschner, Steve and Hasan, Milos and Wang, Beibei},
 title = {Fiber-level Woven Fabric Capture from a Single Microscopic Image},
@@ -143,6 +161,23 @@ keywords = {fabric capture, fabric rendering, fiber-level}
   archivePrefix={arXiv},
   primaryClass={cs.CG},
   url={https://arxiv.org/abs/2605.02224}, 
+}
+@inproceedings{parameterspacerestir,
+author = {Chang, Wesley and Sivaram, Venkataram and Nowrouzezahrai, Derek and Hachisuka, Toshiya and Ramamoorthi, Ravi and Li, Tzu-Mao},
+title = {Parameter-space ReSTIR for Differentiable and Inverse Rendering},
+year = {2023},
+isbn = {9798400701597},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3588432.3591512},
+doi = {10.1145/3588432.3591512},
+abstract = {Differentiable rendering is frequently used in gradient descent-based inverse rendering pipelines to solve for scene parameters – such as reflectance or lighting properties – from target image inputs. Efficient computation of accurate, low variance gradients is critical for rapid convergence. While many methods employ variance reduction strategies, they operate independently on each gradient descent iteration, requiring large sample counts and computation. Gradients may however vary slowly between iterations, leading to unexplored potential benefits when reusing sample information to exploit this coherence. We develop an algorithm to reuse Monte Carlo gradient samples between gradient iterations, motivated by reservoir-based temporal importance resampling in forward rendering. Direct application of this method is not feasible, as we are computing many derivative estimates (i.e., one per optimization parameter) instead of a single pixel intensity estimate; moreover, each of these gradient estimates can affect multiple pixels, and gradients can take on negative values. We address these challenges by reformulating differential rendering integrals in parameter space, developing a new resampling estimator that treats negative functions, and combining these ideas into a reuse algorithm for inverse texture optimization. We significantly reduce gradient error compared to baselines, and demonstrate faster inverse rendering convergence in settings involving complex direct lighting and material textures.},
+booktitle = {ACM SIGGRAPH 2023 Conference Proceedings},
+articleno = {18},
+numpages = {10},
+keywords = {differentiable rendering, inverse rendering, resampling},
+location = {Los Angeles, CA, USA},
+series = {SIGGRAPH '23}
 }
 @inproceedings{huang2022hdr,
   title={Hdr-nerf: High dynamic range neural radiance fields},
@@ -268,7 +303,13 @@ TODO
 == PureSample: Neural Materials Learned by Sampling Microgeometry [#link("https://arxiv.org/abs/2508.07240", "ArXiv")]
 #image("/images/sig26-paper-notes-1/PureSample.png")
 
-TODO
+现代渲染可以借助 Neural BRDF 来表达过去材质模型无法表达的复杂材质。该文章注意到实际物体的材质基本上由表面的微结构决定，microfacet 模型等都只是对微结构的简化，而直接对微结构做 Path Tracing 开销则过大，因此提出用神经网络去从给出的微结构几何中学出一个可采样的 BRDF。
+
+神经网络的输入来自对微表面的小区域做数次 Path Tracing 模拟（考虑到微结构实际上是 Sampling 易、Eval 难的），得到的数个 $(omega_i, omega_o)$ 的样本，用 Flow Matching 的方法得到一个由简单分布到目标分布的可逆的“速度场”，从而使得 BRDF 可以被高效地采样和估值。具体求解的算法是 MeanFlow @geng2025meanflowsonestepgenerative ，感觉值得一看。注意到重分布只能表示散射行为而不能表示吸收行为，因此还需要对模拟的结果训练一个 Albedo 网络作为整体的吸收系数。由于从速度场中估值 pdf 比较耗，本文还蒸馏了一个轻量的 pdf 用于 MIS 权重和 BRDF 值计算，只在必要时才用无偏的 pdf。
+
+和去年的 Neural BRDF 重参数化采样 @wu2025neuralbrdfimportancesampling 的区别主要在本文的目标微结构 BRDF 是可采样的，且要求得到的 Neural BRDF 可估值，从而采用的是 Flow Matching 算法，而 Wu 的工作则是针对一个难采样的 Neural BRDF 设计可采样的重要性分布，且不要求可估值。
+
+之前没做过材质，几乎都想不到这个问题。果然还是得和做 Rendering 的人多交流。
 
 == Multi-feature Radiance Baking Neural Networks for Instant Volumetric Rendering
 #image("/images/sig26-paper-notes-1/MRBNN.png")
@@ -282,11 +323,29 @@ TODO
 #image("/images/sig26-paper-notes-1/WoP-teaser.png")
 #emph[自己的文章，嘿嘿]
 
-TODO
+考虑到 Walk on Spheres 的采样过程，每一步都要在球面上均匀采样一个点作为该点解值的一个无偏估计。由 Off-center 形式的平均值公式可以得到实际上在球内的偏心点按 Poisson Kernel 分布在球面上采样一个点得到的结果也是解值的无偏估计。因此 WoS 均匀采样得到的解值可以为球内每个点所重用，在算法上就是得到一条完整路径后将求解值 Splat 回路径上的每个球内。这个算法被我们称为 Naive Path Reuse，不清楚现在 sig 上那篇 Talking to Neighbors 有没有扩展成这样的形式。
+
+#figure(
+  caption: "我们的 Naive Path Reuse 算法",
+  image("/images/sig26-paper-notes-1/wop_path_reuse.png"),
+) <fig-wop-path-reuse>
+
+然后考虑到这样 Splat 的开销过于大（球内每个点都需要查询并访存一次），正好 25 年 11 月又出来了 Harmonic Caching 的文章，发现后者正好可以将 Splat 的任务转化为求解几个 Fourier 系数的任务。因此和 HC 类似地在求解域预放置一些探针球，游走时取一个探针球做 Poisson Kernel 采样找到边界，若不存在探针球就 Fallback 到传统的 WoSt 算法，可以验证这个行为仍然是满足布朗运动的。找到 Dirichlet 边界后就将求解到的结果送回探针球中贡献 Fourier 系数。然后就非常快了。
+
+#figure(
+  caption: "我们的 Walk on Probes 算法",
+  image("/images/sig26-paper-notes-1/wop_algorithm.png"),
+) <fig-wop-algorithm>
+
+当时这篇文章的 idea 成形已经是 11 月底了，只有两个月的时间做，临近交稿的时候还有各种 ddl 和期末考试，压力巨大。还好做完了，如果再晚半年就要和这些新的方差缩减算法比了，甚至要和 Best Paper 比，好可怕。
 
 == Walk on Decomposed Subdomains: A Hybrid Monte Carlo–Deterministic Solver for Elliptic PDEs @wods [#link("https://clementjambon.github.io/wods/index.html", "Project")]
 #image("/images/sig26-paper-notes-1/wods.png")
 #emph[今年 Best Paper，太猛了]
+
+为了避免常规 Walk on Stars 路径过长的问题，该方法把求解域分为了网格状子域，用虚拟的 Dirichlet 边界分开，逐个求解再合并，这样每个子区域都是 Dirichlet 为主的区域，就易于求解了。
+
+论文内容量好大，做了超级多的实验和探索。总觉得自己也想到过类似的方法，但没能落地到这么实在的程度。
 
 TODO
 
@@ -322,7 +381,18 @@ TODO
 
 TODO
 
-= 这周读到的一些非 SIG26 文章
+= 这两周读到的一些非 SIG26 文章
+
+== MVInverse: Feed-forward Multiview Inverse Rendering in Seconds #link("https://maddog241.github.io/mvinverse-page/", "Project")
+#image("/images/sig26-paper-notes-1/mvinverse.png")
+#emph[CVPR 2026 的文章。总感觉材质重建这种任务还是得靠生成式方法。]
+
+TODO
+
+== Parameter-space ReSTIR for Differentiable and Inverse Rendering @parameterspacerestir
+#image("/images/sig26-paper-notes-1/parameter-space-restir.png")
+
+因为在思考在可微渲染任务里用 ReSTIR 所以看了。这篇主要提到可微渲染需要对梯度做积分，因此考虑用 ReSTIR 加速对梯度的采样。然后因为梯度向量的维数和参数相关，存屏幕空间会过大，因此需要在参数空间给每个参数单独存。并且因为梯度向量在实数域上，所以要对正值和负值分别设置储层，是一个经典 trick 了。这篇在当年也是 Conference Track。看完觉得自己的 idea 不可行了（x
 
 == HDR-NeRF: High Dynamic Range Neural Radiance Fields @huang2022hdr #link("https://xhuangcv.github.io/hdr-nerf/", "Project")
 #image("/images/sig26-paper-notes-1/HDR-NeRF.png")
@@ -337,4 +407,12 @@ TODO
 == LazyBrush: Flexible Painting Tool for Hand-drawn Cartoons @lazybrush
 #image("/images/sig26-paper-notes-1/lazybrush.png")
 
-TODO
+EG 2008 的老文章，解决的是非封闭线稿填色的问题，现在该方法被用在了 Krita 中。
+
+该文章想处理的交互逻辑如上图中间，用一笔选择想要填色的区域内部，即可得到右图这样，线稿内部完美填色，而线稿外部漏出的区域自动被修正掉。该文章将不完美填色问题建模成一个能量优化问题。能量函数由定义在两像素之间连边上的平滑项 $V_(p,q)$ 和像素点上的数据项 $D_p$ 组成。填色区域的边界会贡献平滑项，而一部分内部像素点会贡献数据项。
+
+平滑项 $V_(p,q)$ 用于找到一条合适的边界，定义为和 $p$ 点的亮度正相关，使得在较亮的区域（线稿内部）切换颜色会有较高的代价，而鼓励在较暗的区域（单根线的“中心”区域）切换颜色。这样的能量会鼓励填色区域不断“膨胀”直到被其所在的线稿区域的线条中心约束住，同时也会约束填色区域在线稿不封闭的小缝隙不漏出来。（边界跨过较窄的缝隙，贡献的能量会低于跨过外部更宽的缝隙）算法会像水流寻找地势最低处一样，寻找一条总光度值最低（最黑）的路径来强行连接断开的线条。
+
+数据项 $D_p$ 用于修正填色时溢出边界的部分，定义为如果一个像素被用户指定需要填色但实际算法决定不填色时，贡献一个常数能量。这意味着如果填满一个溢出区域边界贡献的能量比删掉这一块区域的能量还高（小区域填满了大边界），不如直接删去这一块。
+
+具体的求解算法为图论的算法，就不在这里讨论了。老一辈图形学人的启发式方法还是漂亮，可惜目前除了 Krita 好像就没在别的软件里看到过了（Procreate 什么时候才能有！）不知道现代图形学的问题里会不会有类似这样“填色”的需求。
