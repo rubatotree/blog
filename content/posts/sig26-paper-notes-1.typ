@@ -73,6 +73,22 @@ series = {SA '23}
   primaryClass={cs.GR},
   url={https://arxiv.org/abs/2605.25426}, 
 }
+@article{does3dgsneedaccuratevolrendering,
+author = {Celarek, A. and Kopanas, G. and Drettakis, G. and Wimmer, M. and Kerbl, B.},
+title = {Does 3D Gaussian Splatting Need Accurate Volumetric Rendering?},
+journal = {Computer Graphics Forum},
+volume = {44},
+number = {2},
+pages = {e70032},
+keywords = {CCS Concepts, • Computing methodologies → Image-based rendering, Volumetric models, Rasterization, Ray tracing},
+doi = {https://doi.org/10.1111/cgf.70032},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/cgf.70032},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/cgf.70032},
+abstract = {Abstract Since its introduction, 3D Gaussian Splatting (3DGS) has become an important reference method for learning 3D representations of a captured scene, allowing real-time novel-view synthesis with high visual quality and fast training times. Neural Radiance Fields (NeRFs), which preceded 3DGS, are based on a principled ray-marching approach for volumetric rendering. In contrast, while sharing a similar image formation model with NeRF, 3DGS uses a hybrid rendering solution that builds on the strengths of volume rendering and primitive rasterization. A crucial benefit of 3DGS is its performance, achieved through a set of approximations, in many cases with respect to volumetric rendering theory. A naturally arising question is whether replacing these approximations with more principled volumetric rendering solutions can improve the quality of 3DGS. In this paper, we present an in-depth analysis of the various approximations and assumptions used by the original 3DGS solution. We demonstrate that, while more accurate volumetric rendering can help for low numbers of primitives, the power of efficient optimization and the large number of Gaussians allows 3DGS to outperform volumetric rendering despite its approximations.},
+year = {2025}
+}
+
+
 @misc{jungerman2026radiancefieldsphotons,
   title={Radiance Fields from Photons}, 
   author={Sacha Jungerman and Aryan Garg and Mohit Gupta},
@@ -271,6 +287,15 @@ series = {SIGGRAPH '23}
 
 由于这篇和 Stochastic 3DGRT 一起将随机深度采样的方法变成了最高效的 3D Gaussian Primitives 正向渲染方法，基于低 spp 渲染结果先验的降噪工作可能会变得更加重要。
 
+这个项目没有什么依赖，工程非常好编译，感觉对进一步优化很友好。在我的 4060 笔记本电脑上试着跑了一下， 30M Gaussians 的场景可以跑到实时，但是帧间的噪声还是很明显。感觉网络降噪需求很迫切哇。
+
+#figure(
+  caption: link("https://www.youtube.com/watch?v=bMXM9ep6Y5I","St. Sebastian church (30 M Gaussians)")+" 场景在我的电脑上运行的结果。帧率在 30 帧左右，帧间噪声还是很明显的。",
+  image("/images/sig26-paper-notes-1/gaussian-point-splatting-screenshot.png"),
+) <fig-gaussian-point-splatting-screenshot>
+
+
+
 == Mobile3DGS³: Accelerate Mobile 3DGS Rendering via Gradient-Aware Super-Sampling and Frame Interpolation
 #image("/images/sig26-paper-notes-1/Mobile3DGS3.png")
 
@@ -312,23 +337,44 @@ Geo-GS 的训练是有深度先验做引导的。在合适的超参数下，Geo-
 
 但有启发性的一点是，把特征放在物体内部确实是合乎 Specular 信息的规律的：当绕着金属物体旋转时，高曲率边界的光照会高频快速地改变，这一部分较大的信息量可以由贴近边界的小高斯去拟合得到；内部的光照会相对较慢地流动，这一部分视角间共用的信息可以由靠近物体内部的大特征高斯拟合。总觉得反射信息共用应当有更好的方式去做。
 
-== Learning View-Dependent Splatting Kernels @ding2026learningviewdependentsplattingkernels [#link("https://arxiv.org/abs/2605.25426", "ArXiv")] [#link("https://www.bilibili.com/video/BV1FGGH6ZESR", "GAMES")]
+== Learning View-Dependent Splatting Kernels @ding2026learningviewdependentsplattingkernels [#link("https://optkernel.github.io/", "Project")] [#link("https://www.bilibili.com/video/BV1FGGH6ZESR", "GAMES")]
 #image("/images/sig26-paper-notes-1/learn-view-dep-kernel.png")
 
-尝试通过学习 Splatting Kernel 提高表达能力。看实验感觉主要优化的是输入视角不充分的区域。
+尝试通过学习 Splatting Kernel 提高表达能力。看实验感觉主要优化的是输入视角不充分的区域。 #strike[靠神经网络去暴力发现信息的规律的工作之二]
 
-本文认为与其像一些往期工作一样在 Camera space 学 Shape，不如在 Object space 学对各个 Object 的各个视角不同的 Kernel。在将 3D Gaussian Primitive 投影到屏幕空间坐标后和 2D Kernel 信息一起提取出 Kernel 的参数，具体重建 Kernel 的方式则是线性插值。
+本文的渲染管线是先将 Gaussian 椭球作为代理几何 Splat 到屏幕空间以得到 Splat 区域每个点到重心的标准化距离；而得到颜色的方法是对每个 Gaussian 将 Gaussian 存储的隐向量（通常为 5 维）、相机空间变换（坐标、缩放因子、旋转矩阵）送进一个全局的“神经投影”MLP $Theta_"proj"$ 中“投影”得到一个 2D 空间的隐向量，再对每个像素点用另一个全局“解码器” MLP $Theta_"dec"$ 接受每个 Gaussian 的隐向量以及标准化距离、输出该 Gaussian 对该像素的贡献，最后做 Alpha Blending 得到最终颜色。训练过程中，Gaussian 的隐向量和相机空间变换都是可学习的参数。
 
 #figure(
-  caption: "渲染管线展示。",
+  caption: "本文的渲染与训练管线展示。",
   image("/images/sig26-paper-notes-1/learn-view-dep-kernel-pipeline.png"),
 ) <fig-learn-view-dep-kernel>
 
-作者提到 3DGS 的主要缺陷是对视角之间关系的假设过强，如一个“长条形”的高斯主要拟合的是较长的毛边，那么它不应该在侧面也投影出一个密度很高的点。
+投影过程换成了“神经投影”，输出值自然可以根据视角不同发生变化，比原先用球谐函数的表达能力要强很多。正向渲染过程中由于 $Theta_"dec"$ 的推理开销较大，因此直接对每个 Gaussian 预计算标准化后径向每个采样点的颜色值并线性插值。
+
+一个有趣的现象是，学习到的 Kernel 参数在相似的场景、物体下会有相似的分布，如可以为树叶、头发等材质生成相似的“最适合”的 Kernel 形状，说明 Kernel 确实学到了一些物体本身的光照特征。
+
+作者提到这篇解决的问题是让 3DGS 的视角一致性更好了，如一个“长条形”的高斯从短边积分和从长边积分的密度应该不同，一篇 EG2025 的文章《Does 3D Gaussian Splatting Need Accurate Volumetric Rendering?》@does3dgsneedaccuratevolrendering 也论述了这种视角依赖性的现象，虽然没太看懂，感觉怪怪的。
+
+我觉得这篇之所以效果比较好是因为它把高斯的不同视角变得独立了，如优化正面能只优化正面，而不会在侧面产生一些伪影（所以输入不充分的区域效果好）。同时它的神经 Kernel 也保证了比较光滑，不会优化出一些比较明显的伪影（和 GabSplat 相比）。总之感觉更多是降低了“出错”的概率，而不是去让好的地方更好了。比较期待能用一个足够好的 Kernel 把细节变得更漂亮，消掉那种“3DGS 痕迹”。实验上的提升比起传统的 3DGS 在 2dB PSNR 左右，和 SOTA 方法相比基本上不到 1dB。
+
+= 3D Gaussians (III) 辐射场的新应用
 
 == Radiance Fields from Photons @jungerman2026radiancefieldsphotons [#link("https://arxiv.org/abs/2407.09386", "ArXiv")]
 #image("/images/sig26-paper-notes-1/radiance-fields-photons.png")
 
+针对“单光子相机”提出的 NeRF 辐射场训练方法。
+
+“单光子相机”（Single Photon Camera）指每个像素仅有 $0$ 和 $1$ 状态表示是否有光子，但帧率极高，可以理解为曝光时间极短、曝光次数极多的相机。“传统相机”（Conventional Camera）则指像素值在 $[0,1]$ 之间、帧率正常、曝光时间长的相机。可以用前者的图像通过累计多次曝光得到后者的图像。前者能提供更多的信息量，特别地，可以避免长时间曝光产生的过曝、拖影等瑕疵，也能解决低亮度下传统相机信息量不足导致重建效果差的问题。现在越来越多的设备开始支持这种单光子相机，因此该论文提出的方法具有很大的实际应用价值。
+
+单光子相机的输入数量极大、每张输入的噪声也很高，且由于高噪无法通过几张相邻输入的关系得到相机位姿。本论文针对这种输入解决了三个问题：
+- 辐射场训练：根据泊松分布，一个像素被打进一个光子的概率 $P$ 和像素内辐射强度 $phi.alt$、曝光时间 $tau$ 的关系为 $ P=1-e^(-phi.alt tau) $
+  单光子相机得到的结果服从以上概率的二项分布，训练一个可做体积分的概率场而非辐射场，由最大似然估计的原理知优化 $norm(P-B)_2$ 即可，形式上和传统 NeRF 是相同的，只是积分后从概率转换到辐射强度需要经过一个含曝光时间 $tau$ 参数的映射。
+- 相机位姿：先根据相邻帧模拟曝光一次重建一个相对不可靠的“虚拟”位姿，然后在辐射场训练的同时把相机位姿也作为可训练参数进行优化。考虑到曝光极频繁的相机运动一定是非常光滑的，本文用低通滤波后的位姿和当前位姿的 Loss 作为一个正则项引导位姿的平滑优化。
+- 大输入量：bit 压缩、实时磁盘读取等 common trick。
+
+本文 claim 的针对运动相机、低光照场景、过曝场景的优化是显然的，因为单光子相机提供了足够多的信息量。技术上感觉也没什么难想到的地方，感觉像是纯粹应用比较小众且有前景就上了。这篇论文的 writing 也很神奇，每一段都有小标题，大标题的用词也很不同寻常，第一次见这种风格的文章。
+
+到底是从哪里知道这种新应用的哇，我也想找一点冷门的应用场景写论文......不知道这篇的应用能不能继续往后水几篇。
 
 = Rendering
 
@@ -371,7 +417,7 @@ NPR 与现代渲染方法结合的话，Neural 方法是难以建模一个相机
 
 TODO
 
-== PureSample: Neural Materials Learned by Sampling Microgeometry [#link("https://arxiv.org/abs/2508.07240", "ArXiv")]
+== PureSample: Neural Materials Learned by Sampling Microgeometry [#link("https://arxiv.org/abs/2508.07240", "ArXiv")] [#link("https://www.bilibili.com/video/BV1CNGH6aEvY", "GAMES")]
 #image("/images/sig26-paper-notes-1/PureSample.png")
 
 用神经网络表达并学习由微几何定义的复杂材质 BRDF。
@@ -473,15 +519,15 @@ TODO
 
 因为在思考在可微渲染任务里用 ReSTIR 所以看了。这篇主要提到可微渲染需要对梯度做积分，因此考虑用 ReSTIR 加速对梯度的采样。然后因为梯度向量的维数和参数相关，存屏幕空间会过大，因此需要在参数空间给每个参数单独存。并且因为梯度向量在实数域上，所以要对正值和负值分别设置储层，是一个经典 trick 了。这篇在当年也是 Conference Track。看完觉得自己的 idea 不可行了（x
 
-== HDR-NeRF: High Dynamic Range Neural Radiance Fields @huang2022hdr #link("https://xhuangcv.github.io/hdr-nerf/", "Project")
-#image("/images/sig26-paper-notes-1/HDR-NeRF.png")
-
-TODO
-
-== NeRF in the Wild: Neural Radiance Fields for Unconstrained Photo Collections @martinbrualla2021nerfwildneuralradiance [#link("https://arxiv.org/abs/2008.02268", "ArXiv")]
-#image("/images/sig26-paper-notes-1/nerfw.png")
-
-TODO
+// == HDR-NeRF: High Dynamic Range Neural Radiance Fields @huang2022hdr #link("https://xhuangcv.github.io/// hdr-nerf/", "Project")
+// #image("/images/sig26-paper-notes-1/HDR-NeRF.png")
+// 
+// TODO
+// 
+// == NeRF in the Wild: Neural Radiance Fields for Unconstrained Photo Collections // @martinbrualla2021nerfwildneuralradiance [#link("https://arxiv.org/abs/2008.02268", "ArXiv")]
+// #image("/images/sig26-paper-notes-1/nerfw.png")
+// 
+// TODO
 
 == LazyBrush: Flexible Painting Tool for Hand-drawn Cartoons @lazybrush
 #image("/images/sig26-paper-notes-1/lazybrush.png")
