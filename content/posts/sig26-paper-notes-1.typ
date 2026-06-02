@@ -205,6 +205,15 @@ keywords = {fabric capture, fabric rendering, fiber-level}
   primaryClass={cs.CG},
   url={https://arxiv.org/abs/2605.02224}, 
 }
+@misc{wu2025mvinversefeedforwardmultiviewinverse,
+  title={MVInverse: Feed-forward Multi-view Inverse Rendering in Seconds}, 
+  author={Xiangzuo Wu and Chengwei Ren and Jun Zhou and Xiu Li and Yuan Liu},
+  year={2025},
+  eprint={2512.21003},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2512.21003}, 
+}
 @inproceedings{parameterspacerestir,
 author = {Chang, Wesley and Sivaram, Venkataram and Nowrouzezahrai, Derek and Hachisuka, Toshiya and Ramamoorthi, Ravi and Li, Tzu-Mao},
 title = {Parameter-space ReSTIR for Differentiable and Inverse Rendering},
@@ -287,14 +296,12 @@ series = {SIGGRAPH '23}
 
 由于这篇和 Stochastic 3DGRT 一起将随机深度采样的方法变成了最高效的 3D Gaussian Primitives 正向渲染方法，基于低 spp 渲染结果先验的降噪工作可能会变得更加重要。
 
-这个项目没有什么依赖，工程非常好编译，感觉对进一步优化很友好。在我的 4060 笔记本电脑上试着跑了一下， 30M Gaussians 的场景可以跑到实时，但是帧间的噪声还是很明显。感觉网络降噪需求很迫切哇。
+这个项目没有什么依赖，工程非常好编译，感觉对进一步优化很友好。在我的 4060 笔记本电脑上试着跑了一下， 30M Gaussians 的场景可以跑到实时，但是帧间的噪声还是很明显。感觉网络降噪需求很迫切哇，想想每个像素能不能拿到更多信息，比如其对应的 Gaussian 的元信息，然后在相邻像素之间做一点概率统计重用什么的，感觉很有搞头啊。
 
 #figure(
   caption: link("https://www.youtube.com/watch?v=bMXM9ep6Y5I","St. Sebastian church (30 M Gaussians)")+" 场景在我的电脑上运行的结果。帧率在 30 帧左右，帧间噪声还是很明显的。",
   image("/images/sig26-paper-notes-1/gaussian-point-splatting-screenshot.png"),
 ) <fig-gaussian-point-splatting-screenshot>
-
-
 
 == Mobile3DGS³: Accelerate Mobile 3DGS Rendering via Gradient-Aware Super-Sampling and Frame Interpolation
 #image("/images/sig26-paper-notes-1/Mobile3DGS3.png")
@@ -506,33 +513,41 @@ TODO
 
 = 这两周读到的一些非 SIG26 文章
 
-== MVInverse: Feed-forward Multiview Inverse Rendering in Seconds #link("https://maddog241.github.io/mvinverse-page/", "Project")
+== MVInverse: Feed-forward Multiview Inverse Rendering in Seconds @wu2025mvinversefeedforwardmultiviewinverse [#link("https://maddog241.github.io/mvinverse-page/", "Project")] (CVPR2026)
 #image("/images/sig26-paper-notes-1/mvinverse.png")
-#emph[CVPR 2026 的文章。总感觉材质重建这种任务还是得靠生成式方法。]
 
-TODO
+输入多视角图片，输出多视角 G-Buffer，效率优化到实时级别。
 
-== Parameter-space ReSTIR for Differentiable and Inverse Rendering @parameterspacerestir
-#image("/images/sig26-paper-notes-1/parameter-space-restir.png")
+本文提出了交替注意力网络结构，在以往单图注意力网络的基础上交替叠加全局、多图之间的注意力网络，从而能在不同视角的注意力之间“对账”保证多视角一致性。
+
+对于编码器，在使用 DINOv2 提供语义先验的基础上还用了 ResNeXt 编码器提取高频特征，保证输出图片是锐利的。
+
+训练阶段采用两阶段训练，第一阶段在标注正确的 3D 数据集上学习物理规律，第二阶段自监督、用真实视频的光流约束，保证两帧之间对同一点的预测输出一致，以提高训练数据量。用锚点损失防止模型微调时产生漂移。
+
+因为以往的预测都是单图的，这里多图提供了更大的信息量，因此指标提升是可以预见的。并且因为多图逆渲染的需求是存在的（可微渲染这边基本都在做这种），故事也说得通。
+
+我没有怎么看过生成方面的文章，每学一个新东西都觉得好神奇。总感觉材质重建这种任务还是得靠生成式方法。
+
+== Parameter-space ReSTIR for Differentiable and Inverse Rendering @parameterspacerestir (SIGGRAPH 2023)
+#image("/images/sig26-paper-notes-1/parameter-space-restir.png") 
 
 用 ReSTIR 提速可微渲染。
 
 因为在思考在可微渲染任务里用 ReSTIR 所以看了。这篇主要提到可微渲染需要对梯度做积分，因此考虑用 ReSTIR 加速对梯度的采样。然后因为梯度向量的维数和参数相关，存屏幕空间会过大，因此需要在参数空间给每个参数单独存。并且因为梯度向量在实数域上，所以要对正值和负值分别设置储层，是一个经典 trick 了。这篇在当年也是 Conference Track。看完觉得自己的 idea 不可行了（x
 
-// == HDR-NeRF: High Dynamic Range Neural Radiance Fields @huang2022hdr #link("https://xhuangcv.github.io/// hdr-nerf/", "Project")
-// #image("/images/sig26-paper-notes-1/HDR-NeRF.png")
-// 
-// TODO
-// 
-// == NeRF in the Wild: Neural Radiance Fields for Unconstrained Photo Collections // @martinbrualla2021nerfwildneuralradiance [#link("https://arxiv.org/abs/2008.02268", "ArXiv")]
-// #image("/images/sig26-paper-notes-1/nerfw.png")
-// 
-// TODO
+== HDR-NeRF: High Dynamic Range Neural Radiance Fields @huang2022hdr #link("https://xhuangcv.github.io/hdr-nerf/", "Project") (CVPR 2022)
+#image("/images/sig26-paper-notes-1/HDR-NeRF.png") 
 
-== LazyBrush: Flexible Painting Tool for Hand-drawn Cartoons @lazybrush
-#image("/images/sig26-paper-notes-1/lazybrush.png")
+用多个曝光条件不同的图片训练 HDR 的 NeRF 场。
 
-EG 2008 的老文章，解决的是非封闭线稿填色的问题，现在该方法被用在了 Krita 中。
+在体积分得到辐射量的后端再接一个根据相机曝光原理设计的可学习含参函数，就能顺便把该视角图片的曝光曲线也学了，因为信息量充分，所以能学到准确的 HDR NeRF 场。
+
+因为当时想着材质重建做不好可能是光场 LDR 的原因，就看了这篇，结果做了实验发现 HDR 的光场并不能得到什么提升，遂放弃。这篇感觉也是一篇从应用切入的文章，好羡慕这种发现小众应用场景的科研能力。
+
+== LazyBrush: Flexible Painting Tool for Hand-drawn Cartoons @lazybrush (EG 2008)
+#image("/images/sig26-paper-notes-1/lazybrush.png") 
+
+老文章。启发式解决非封闭线稿填色的问题，现在该方法被用在了 Krita 中。
 
 该文章想处理的交互逻辑如上图中间，用一笔选择想要填色的区域内部，即可得到右图这样，线稿内部完美填色，而线稿外部漏出的区域自动被修正掉。该文章将不完美填色问题建模成一个能量优化问题。能量函数由定义在两像素之间连边上的平滑项 $V_(p,q)$ 和像素点上的数据项 $D_p$ 组成。填色区域的边界会贡献平滑项，而一部分内部像素点会贡献数据项。
 
