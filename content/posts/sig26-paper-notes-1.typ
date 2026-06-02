@@ -55,6 +55,15 @@ series = {SA '23}
   primaryClass={cs.CV},
   url={https://arxiv.org/abs/2503.14171}, 
 }
+@misc{fan2026refdgsreflectivedualgaussian,
+  title={Ref-DGS: Reflective Dual Gaussian Splatting}, 
+  author={Ningjing Fan and Yiqun Wang and Dongming Yan and Peter Wonka},
+  year={2026},
+  eprint={2603.07664},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2603.07664}, 
+}
 @article{West2026,
   author = {West, Rex and Mukherjee, Sayan and Yue, Yonghao},
   title = {Lifting Lines and Tone: Image-space Stylization in Path-space},
@@ -213,7 +222,7 @@ series = {SIGGRAPH '23}
 )
 
 #image("/images/sig26-paper-notes-1/teaser.png")
-= 3D Gaussians
+= 3D Gaussians (I) 正向渲染加速
 
 == Gaussian Point Splatting @Rijsdijk2026GaussianPointSplatting [#link("https://jorisar.nl/gaussian_point_splatting/", "Project")]
 #image("/images/sig26-paper-notes-1/Rijsdijk2026GaussianPointSplatting.png")
@@ -249,7 +258,9 @@ series = {SIGGRAPH '23}
 
 #emph[曾经助教、现好朋友 #link("https://github.com/SyouSanGin", "@SyouSanGin") 的第一篇 SIGGRAPH，靠内部关系拿到了文章。]
 
-本文做的是 3DGS 的超分。主要是观察到 3DGS 的屏幕空间梯度可以提前计算并缓存，在 0.25x 分辨率渲染时 Splat 颜色的同时也 Splat 每个像素的梯度信息，进一步做像素间多项式样条插值，即可在更快的速度内得到高质量的正向渲染结果。
+本文做的是 3DGS 的超分。
+
+主要是观察到 3DGS 的屏幕空间梯度可以提前计算并缓存，在 0.25x 分辨率渲染时 Splat 颜色的同时也 Splat 每个像素的梯度信息，进一步做像素间多项式样条插值，即可在更快的速度内得到高质量的正向渲染结果。
 
 由于 3DGS 在图像空间的渲染结果本来就是比较光滑的（受到 3DGS 基元大小的限制，还受到训练集分辨率的限制），因此样条插值效果就很好。
 
@@ -258,6 +269,34 @@ series = {SIGGRAPH '23}
 过去的渲染超分方法（不限于 GS）普遍需要 GBuffer 作为网络的补充信息，而本文面对 3DGS 的任务当然是没有 GBuffer 的，合理利用已有信息量（像素点的微分信息）对邻域进行插值是相当漂亮的思路。在 25 年 11 月该文作者发现有一篇 ArXiv 论文 @niedermayr2025lightweightgradientawareupscaling3d 和他的思路撞了。但这篇提出了切空间梯度缓存的方法并且在工程上实现在了 GPU+NPU 上，在效率上做到了 make sense。
 
 很喜欢这种充分挖掘并高效利用信息量，而不是靠神经网络去暴力发现信息的规律的工作。
+
+= 3D Gaussians (II) 表达能力优化
+
+== Ref-DGS: Reflective Dual Gaussian Splatting @fan2026refdgsreflectivedualgaussian [#link("https://straybirdflower.github.io/Ref-DGS/", "Project")]
+#image("/images/sig26-paper-notes-1/refdgs.png")
+
+靠构建“虚像”实现 2DGS 近场镜面反射的工作。#strike[靠神经网络去暴力发现信息的规律的工作]
+
+过去的工作在重建镜面/Specular 场景时经常存在强行拟合镜面反射导致几何塌陷的问题，在几何出问题的同时光照也没能很好地拟合。因此本文希望解耦仅与几何相关的视角无关光照和 Specular 光照，从而在可微渲染过程中同时得到可信的几何和可信的 Specular 光照。
+
+考虑将光照分为视角无关和视角相关两部分相加，视角无关的部分可以很好地由传统的、几何紧贴表面的 2DGS（Geo-GS）表示。因为有了可信的几何所以也可以在上面得到 Normal 并优化 Diffuse 和 Roughness 材质参数。注意这里的 Diffuse 是加性的光照“直流分量”，而不是乘性的 Albedo，在定义上和材质模型有一些区别。
+
+视角相关部分进一步分为相机位姿无关（远场）和相机位姿相关（近场）部分，前者可以用可学习的环境贴图表示，后者则是本文主要的创新点，用另一组存储特征向量的 2DGS（Local-GS）表示，表示镜面内部的“虚像”。将 Local-GS Splat 到屏幕上、对每个像素将 Roughness 信息、相机与法线夹角信息和环境光贴图一起送进一个轻量的可学习 MLP 得到 Specular，直接加到 Diffuse 图上。
+
+#figure(
+  caption: "Ref-DGS 的渲染管线展示。Geo-GS 为视角无关的 GS，Sph-Mip 为远场光照（环境贴图 MipMap），Local-GS 为渲染近场视角相关光照使用的虚拟“虚像”高斯。",
+  image("/images/sig26-paper-notes-1/refdgs-pipeline.png"),
+) <fig-refdgs-pipeline>
+
+Geo-GS 的训练是有深度先验做引导的。在合适的超参数下，Geo-GS 会忠实地贴在几何表面，Local-GS 则会进入物体内部拟合 Specular，从而得到优秀的几何。同时论文也确实能很好地表现将 Diffuse 部分和 Specular 部分解耦开（虽然这不是我们想要的解耦“烘焙式光照”）。
+
+很难信任用“虚像”的方法来做 Specular 的视差现象。在有曲率的曲面内部仍然做透视投影感觉根本说不通，不知道神经网络学到什么东西就拟合出来了。很难想象物体内部多个视角生成的 Local-GS 和轻量 MLP 是怎么耦合的。MLP 训练的参数是针对全局的，不知道为什么不做预训练。这个方法看起来也做不了薄物体，不知道怎样才能避免干扰。对 3DGS 不擅长处理的视角相关光照分开处理当然是合理的，但这样做实在让人不安。实验展示了指标上升，但看不出指标上升是因为渲染管线好了还是单纯因为几何好了（考虑到这里几何还用了先验）。
+
+但有启发性的一点是，把特征放在物体内部确实是合乎 Specular 信息的规律的：当绕着金属物体旋转时，高曲率边界的光照会高频快速地改变，这一部分较大的信息量可以由贴近边界的小高斯去拟合得到；内部的光照会相对较慢地流动，这一部分视角间共用的信息可以由靠近物体内部的大特征高斯拟合。总觉得反射信息共用应当有更好的方式去做。
+
+== Learning View-Dependent Splatting Kernels
+
+== Radiance Fields from Photons
 
 = Rendering
 
@@ -303,6 +342,8 @@ TODO
 == PureSample: Neural Materials Learned by Sampling Microgeometry [#link("https://arxiv.org/abs/2508.07240", "ArXiv")]
 #image("/images/sig26-paper-notes-1/PureSample.png")
 
+用神经网络表达并学习由微几何定义的复杂材质 BRDF。
+
 现代渲染可以借助 Neural BRDF 来表达过去材质模型无法表达的复杂材质。该文章注意到实际物体的材质基本上由表面的微结构决定，microfacet 模型等都只是对微结构的简化，而直接对微结构做 Path Tracing 开销则过大，因此提出用神经网络去从给出的微结构几何中学出一个可采样的 BRDF。
 
 神经网络的输入来自对微表面的小区域做数次 Path Tracing 模拟（考虑到微结构实际上是 Sampling 易、Eval 难的），得到的数个 $(omega_i, omega_o)$ 的样本，用 Flow Matching 的方法得到一个由简单分布到目标分布的可逆的“速度场”，从而使得 BRDF 可以被高效地采样和估值。具体求解的算法是 MeanFlow @geng2025meanflowsonestepgenerative ，感觉值得一看。注意到重分布只能表示散射行为而不能表示吸收行为，因此还需要对模拟的结果训练一个 Albedo 网络作为整体的吸收系数。由于从速度场中估值 pdf 比较耗，本文还蒸馏了一个轻量的 pdf 用于 MIS 权重和 BRDF 值计算，只在必要时才用无偏的 pdf。
@@ -323,6 +364,8 @@ TODO
 #image("/images/sig26-paper-notes-1/WoP-teaser.png")
 #emph[自己的文章，嘿嘿]
 
+利用路径信息重用高效优化 Walk on Spheres 系列算法。
+
 考虑到 Walk on Spheres 的采样过程，每一步都要在球面上均匀采样一个点作为该点解值的一个无偏估计。由 Off-center 形式的平均值公式可以得到实际上在球内的偏心点按 Poisson Kernel 分布在球面上采样一个点得到的结果也是解值的无偏估计。因此 WoS 均匀采样得到的解值可以为球内每个点所重用，在算法上就是得到一条完整路径后将求解值 Splat 回路径上的每个球内。这个算法被我们称为 Naive Path Reuse，不清楚现在 sig 上那篇 Talking to Neighbors 有没有扩展成这样的形式。
 
 #figure(
@@ -342,6 +385,8 @@ TODO
 == Walk on Decomposed Subdomains: A Hybrid Monte Carlo–Deterministic Solver for Elliptic PDEs @wods [#link("https://clementjambon.github.io/wods/index.html", "Project")]
 #image("/images/sig26-paper-notes-1/wods.png")
 #emph[今年 Best Paper，太猛了]
+
+通过空间划分解决 WoSt 路径过长的问题，从而高效提升速度。
 
 为了避免常规 Walk on Stars 路径过长的问题，该方法把求解域分为了网格状子域，用虚拟的 Dirichlet 边界分开，逐个求解再合并，这样每个子区域都是 Dirichlet 为主的区域，就易于求解了。
 
@@ -391,6 +436,8 @@ TODO
 
 == Parameter-space ReSTIR for Differentiable and Inverse Rendering @parameterspacerestir
 #image("/images/sig26-paper-notes-1/parameter-space-restir.png")
+
+用 ReSTIR 提速可微渲染。
 
 因为在思考在可微渲染任务里用 ReSTIR 所以看了。这篇主要提到可微渲染需要对梯度做积分，因此考虑用 ReSTIR 加速对梯度的采样。然后因为梯度向量的维数和参数相关，存屏幕空间会过大，因此需要在参数空间给每个参数单独存。并且因为梯度向量在实数域上，所以要对正值和负值分别设置储层，是一个经典 trick 了。这篇在当年也是 Conference Track。看完觉得自己的 idea 不可行了（x
 

@@ -50,6 +50,15 @@ Linux 等
 url = "https://featherp.com/"
 github = "Feather-P"
 
+[[friends]]
+name = "the homepage of Eastwind"
+description = """
+Eastwind 离散数学系列助教
+数学笔记，游戏设计等
+"""
+url = "http://home.ustc.edu.cn/~eastwind/"
+avatar = "http://home.ustc.edu.cn/~eastwind/images/profile_square.jpg"
+
 +++
 
 这里是我所珍视的好朋友们的博客链接——
