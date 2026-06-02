@@ -64,6 +64,24 @@ series = {SA '23}
   primaryClass={cs.CV},
   url={https://arxiv.org/abs/2603.07664}, 
 }
+@misc{ding2026learningviewdependentsplattingkernels,
+  title={Learning View-Dependent Splatting Kernels}, 
+  author={Huakeng Ding and Zhanpeng Liu and Fan Pei and Kun Zhou and Hongzhi Wu},
+  year={2026},
+  eprint={2605.25426},
+  archivePrefix={arXiv},
+  primaryClass={cs.GR},
+  url={https://arxiv.org/abs/2605.25426}, 
+}
+@misc{jungerman2026radiancefieldsphotons,
+  title={Radiance Fields from Photons}, 
+  author={Sacha Jungerman and Aryan Garg and Mohit Gupta},
+  year={2026},
+  eprint={2407.09386},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2407.09386}, 
+}
 @article{West2026,
   author = {West, Rex and Mukherjee, Sayan and Yue, Yonghao},
   title = {Lifting Lines and Tone: Image-space Stylization in Path-space},
@@ -85,13 +103,13 @@ series = {SA '23}
   url={https://arxiv.org/abs/2505.13447}, 
 }
 @misc{wu2025neuralbrdfimportancesampling,
-      title={Neural BRDF Importance Sampling by Reparameterization}, 
-      author={Liwen Wu and Sai Bi and Zexiang Xu and Hao Tan and Kai Zhang and Fujun Luan and Haolin Lu and Ravi Ramamoorthi},
-      year={2025},
-      eprint={2505.08998},
-      archivePrefix={arXiv},
-      primaryClass={cs.GR},
-      url={https://arxiv.org/abs/2505.08998}, 
+  title={Neural BRDF Importance Sampling by Reparameterization}, 
+  author={Liwen Wu and Sai Bi and Zexiang Xu and Hao Tan and Kai Zhang and Fujun Luan and Haolin Lu and Ravi Ramamoorthi},
+  year={2025},
+  eprint={2505.08998},
+  archivePrefix={arXiv},
+  primaryClass={cs.GR},
+  url={https://arxiv.org/abs/2505.08998}, 
 }
 @article{FiberLevel,
 author = {Li, Zixuan and Shen, Pengfei and Sun, Hanxiao and Zhang, Zibo and Guo, Yu and Liu, Ligang and Yan, Lingqi and Marschner, Steve and Hasan, Milos and Wang, Beibei},
@@ -294,9 +312,23 @@ Geo-GS 的训练是有深度先验做引导的。在合适的超参数下，Geo-
 
 但有启发性的一点是，把特征放在物体内部确实是合乎 Specular 信息的规律的：当绕着金属物体旋转时，高曲率边界的光照会高频快速地改变，这一部分较大的信息量可以由贴近边界的小高斯去拟合得到；内部的光照会相对较慢地流动，这一部分视角间共用的信息可以由靠近物体内部的大特征高斯拟合。总觉得反射信息共用应当有更好的方式去做。
 
-== Learning View-Dependent Splatting Kernels
+== Learning View-Dependent Splatting Kernels @ding2026learningviewdependentsplattingkernels [#link("https://arxiv.org/abs/2605.25426", "ArXiv")] [#link("https://www.bilibili.com/video/BV1FGGH6ZESR", "GAMES")]
+#image("/images/sig26-paper-notes-1/learn-view-dep-kernel.png")
 
-== Radiance Fields from Photons
+尝试通过学习 Splatting Kernel 提高表达能力。看实验感觉主要优化的是输入视角不充分的区域。
+
+本文认为与其像一些往期工作一样在 Camera space 学 Shape，不如在 Object space 学对各个 Object 的各个视角不同的 Kernel。在将 3D Gaussian Primitive 投影到屏幕空间坐标后和 2D Kernel 信息一起提取出 Kernel 的参数，具体重建 Kernel 的方式则是线性插值。
+
+#figure(
+  caption: "渲染管线展示。",
+  image("/images/sig26-paper-notes-1/learn-view-dep-kernel-pipeline.png"),
+) <fig-learn-view-dep-kernel>
+
+作者提到 3DGS 的主要缺陷是对视角之间关系的假设过强，如一个“长条形”的高斯主要拟合的是较长的毛边，那么它不应该在侧面也投影出一个密度很高的点。
+
+== Radiance Fields from Photons @jungerman2026radiancefieldsphotons [#link("https://arxiv.org/abs/2407.09386", "ArXiv")]
+#image("/images/sig26-paper-notes-1/radiance-fields-photons.png")
+
 
 = Rendering
 
