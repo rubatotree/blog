@@ -87,8 +87,6 @@ eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/cgf.70032},
 abstract = {Abstract Since its introduction, 3D Gaussian Splatting (3DGS) has become an important reference method for learning 3D representations of a captured scene, allowing real-time novel-view synthesis with high visual quality and fast training times. Neural Radiance Fields (NeRFs), which preceded 3DGS, are based on a principled ray-marching approach for volumetric rendering. In contrast, while sharing a similar image formation model with NeRF, 3DGS uses a hybrid rendering solution that builds on the strengths of volume rendering and primitive rasterization. A crucial benefit of 3DGS is its performance, achieved through a set of approximations, in many cases with respect to volumetric rendering theory. A naturally arising question is whether replacing these approximations with more principled volumetric rendering solutions can improve the quality of 3DGS. In this paper, we present an in-depth analysis of the various approximations and assumptions used by the original 3DGS solution. We demonstrate that, while more accurate volumetric rendering can help for low numbers of primitives, the power of efficient optimization and the large number of Gaussians allows 3DGS to outperform volumetric rendering despite its approximations.},
 year = {2025}
 }
-
-
 @misc{jungerman2026radiancefieldsphotons,
   title={Radiance Fields from Photons}, 
   author={Sacha Jungerman and Aryan Garg and Mohit Gupta},
@@ -140,6 +138,25 @@ note = {Just Accepted},
 journal = {ACM Trans. Graph.},
 month = may,
 keywords = {fabric capture, fabric rendering, fiber-level}
+}
+@article{scratchart,
+author = {Shen, Pengfei and Li, Ruizeng and Wang, Beibei and Liu, Ligang},
+title = {Scratch-based Reflection Art via Differentiable Rendering},
+year = {2023},
+issue_date = {August 2023},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {42},
+number = {4},
+issn = {0730-0301},
+url = {https://doi.org/10.1145/3592142},
+doi = {10.1145/3592142},
+abstract = {The 3D visual optical arts create fascinating special effects by carefully designing interactions between objects and light sources. One of the essential types is 3D reflection art, which aims to create reflectors that can display different images when viewed from different directions. Existing works produce impressive visual effects. Unfortunately, previous works discretize the reflector surface with regular grids/facets, leading to a large parameter space and a high optimization time cost. In this paper, we introduce a new type of 3D reflection art - scratch-based reflection art, which allows for a more compact parameter space, easier fabrication, and computationally efficient optimization. To design a 3D reflection art with scratches, we formulate it as a multi-view optimization problem and introduce differentiable rendering to enable efficient gradient-based optimizers. For that, we propose an analytical scratch rendering approach, together with a high-performance rendering pipeline, allowing efficient differentiable rendering. As a consequence, we could display multiple images on a single metallic board with only several minutes for optimization. We demonstrate our work by showing virtual objects and manufacturing our designed reflectors with a carving machine.},
+journal = {ACM Trans. Graph.},
+month = jul,
+articleno = {65},
+numpages = {12},
+keywords = {scratch rendering, differentiable rendering, 3D reflection art}
 }
 @article{wods,
   author     = {Jambon, Cl\'{e}ment and Nabizadeh, Mohammad Sina and Konakovi\'{c} Lukovi\'{c}, Mina},
@@ -420,9 +437,27 @@ NPR 与现代渲染方法结合的话，Neural 方法是难以建模一个相机
 
 == Fiber-level Woven Fabric Capture from a Single Microscopic Image @FiberLevel
 #image("/images/sig26-paper-notes-1/FiberLevel.png")
-#emph[另一位助教的文章之一。]
+#emph[另一位助教的文章之一。这篇没有上 Sig26，只是录进了 ToG，但也放在这里。]
 
-TODO
+从单张显微图像通过可微渲染重建织物的纤维级几何和材质。
+
+对于几何建模了基本可微的五层结构：
+- 编织模式 Pattern：平纹、斜纹等纹理模式，直接预设好，用预训练的 CNN 分类；
+- 中心线层 Yarn Centerline：每根纤维从侧面看高度关于路径长度的函数，用抛物线和圆混合；
+- 纤维截面层 Cross-sectional Fiber Distribution：在中心线周围生成 $m$ 根纤维，纤维的螺旋扭转 $alpha$、偏移 $R_i$、周期性挤压变形等都是可微参数；
+- 随机噪声层 Randomized Variation：用柏林噪声和白噪声让纤维的半径和纵向产生变化、噪声种子本身不可微但强度可微。
+- 飘散纤维层 Flyaway Model：额外手动添加飘散出来的断线等纤维（定义有毛发 Hair 和环路 Loop 两种），模拟现实材质情况。这一层没法可微优化出来。
+
+材质模型采用了 Chiang 的材质模型，特点是建模了光照的多次散射，可以精确模拟纤维的行为。
+
+训练采用三个阶段：
+- 初始化：用预训练的 CNN 先预测出这些参数的初值，其中编织模式、截面纤维数目等不可微参数在这一步就固定了。因为 CNN 擅长识别类型、数目等模式，所以这些初值就能非常可靠。对于材质在预测 Chiang 模型参数的同时还预测一组简化材质模型参数。
+- 基于光栅化做粗优化：这一步用简化的材质模型（单散+Lambert）进行逆渲染，主要优化几何、颜色等。用 NVDiffRast 的“软边界光栅化”做高速逆渲染。优化 CNN 输出的 Gram 矩阵特征（结构）和 RGB（颜色）两个 Loss。这一步后几何参数被固定。
+- 基于路径追踪做精细优化：将材质参数映射回 Chiang 模型，用 mitsuba 做可微路径追踪优化纤维材质参数。因为此时参数已经很少且基本准确，这一步可以做到很稳定的精细优化。
+
+这篇提到的主要 Limitation 有：编制模式是预设的因此覆盖范围有限；不支持空间变化的颜色等、而实际情况是一些织物纤维本身存在渐变或布面印染等，难以 trivial 地支持；飘散纤维没有很好地被建模、无法可微优化；经纬纱颜色相似时边界会变模糊、模式会变得不明显、对初始化和粗优化阶段都不友好；几何模型目前只支持单股纱线、不支持复杂的合股纱；路径追踪阶段仍然耗时。
+
+这篇审美真好，感觉每一步都很合理优雅哇。感觉这个需求是沈学长以往做的划痕艺术 @scratchart 的超级加强版。太厉害了。
 
 == PureSample: Neural Materials Learned by Sampling Microgeometry [#link("https://arxiv.org/abs/2508.07240", "ArXiv")] [#link("https://www.bilibili.com/video/BV1CNGH6aEvY", "GAMES")]
 #image("/images/sig26-paper-notes-1/PureSample.png")
