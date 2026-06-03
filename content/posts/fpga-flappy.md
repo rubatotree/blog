@@ -1,5 +1,5 @@
 ---
-title: 用 FPGA 写 Flappy Bird！
+title: 用 FPGA 写 Flappy Bird
 date: 2026-05-11
 tags:
 - 游戏开发

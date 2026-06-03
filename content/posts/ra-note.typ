@@ -2,17 +2,17 @@
 #import "@hugo/utils:0.1.0": *
 
 #show: article.with(
-  title: "实分析复习笔记",
+  title: "实分析 课程总结笔记",
   date: datetime(year: 2026, month: 5, day: 11),
   weight: 0,
   tags: (
-    category: ("数学", "分析")
+    category: ("数学", "分析", "课程笔记")
   ),
   draft: false,
   references: ```yml
     ra-lecture-note:
       type: Blog
-      title: "实分析笔记"
+      title: "实分析讲义"
       author: 于树澄
       date: 2024
       url:

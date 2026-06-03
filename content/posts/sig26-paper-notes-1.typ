@@ -6,7 +6,7 @@
   date: datetime(year: 2026, month: 5, day: 27),
   weight: 0,
   tags: (
-    category: "计算机图形学"
+    category: ("计算机图形学", "3D Gaussians", "Rendering", "Monte Carlo PDE", "Geometry", "论文笔记")
   ),
   draft: false,
   references: ```bib
@@ -157,6 +157,13 @@ month = jul,
 articleno = {65},
 numpages = {12},
 keywords = {scratch rendering, differentiable rendering, 3D reflection art}
+}
+@inproceedings{ MRPNN,
+	author       = {Jinkai Hu and Chengzhong Yu and Hongli Liu and Ling-qi Yan and Yiqian Wu and Xiaogang Jin},
+	title        = {Deep Real-time Volumetric Rendering Using Multi-feature Fusion},
+	booktitle    = {{SIGGRAPH} '23: Special Interest Group on Computer Graphics and Interactive Techniques Conference, Los Angeles CA, United States, August 6 - 10, 2023},
+	publisher    = {{ACM}},
+	year         = {2023}
 }
 @article{wods,
   author     = {Jambon, Cl\'{e}ment and Nabizadeh, Mohammad Sina and Konakovi\'{c} Lukovi\'{c}, Mina},
@@ -483,15 +490,45 @@ NPR 与现代渲染方法结合的话，Neural 方法是难以建模一个相机
 #image("/images/sig26-paper-notes-1/MRBNN.png")
 #emph[好感动，MRPNN 的优化也被做出来了。同样是靠内部关系拿到的文章。]
 
-用预烘焙的神经辐射场加速参与介质的“MRPNN 式”体渲染。
+用预烘焙的神经辐射场加速参与介质的“MRPNN @MRPNN 式”体渲染，目标是烘焙一个只和密度场相关的预计算特征场，使得可以在各种光照条件下高速渲染体积，且解决 MRPNN 的欠采样情形 failure case。
 
-注意到光的散射行为实际上是一个卷积 $L_o (omega_o)=L_i (omega_i) * rho(omega_i, omega_o)$。本文做一个傅里叶变换到球谐函数基下，就能把 $O(l^2)$ 卷积优化到 $O(l)$ 的逐点相乘（类似 OI 中 FFT 解决多项式乘法）。并且傅里叶变换还有个好处是只存低阶球谐系数就能概括光场的大部分特征，提高缓存与实时计算效率。
+过去工作提到，体积中的辐射传输可以用一个算子 $cal(K)$ 定义，对于体积中每一个位置，将局部的入射辐射函数映射为该点的出射辐射函数。易知这个算子只和相位函数有关，而和光照无关，而局部入射函数和位置、远场入射辐射、密度/相位函数分布有关。算子 $cal(K)$ 可以形式化表述为一个卷积算子：
+
+$
+S(p,omega)=(cal(K)L)(p,omega):=integral_(S^2) phi.alt(p,(omega_i dot omega)) L(p,omega_i) dif omega_i
+$
+
+本文的主要观察是，这个算子在球谐函数基下是对角化的，从而算子的作用可以转化为各阶球谐系数和算子系数的逐点乘法，以高效存储和求解。这个思想非常类似于算法中用 FFT 求解多项式乘法，同样是通过做一个傅里叶变换去将卷积算子对角化，非常优雅。
+
+$
+S(p,omega)=sum_(l=0)^infinity eta_l (p) sum_(m=-l)^l L_l^m (p,omega_s) Y_l^m (omega)
+$
+
+然而局部入射辐射函数仍然是难求的，需要在体积内部模拟多次散射才能得到。并且，这是一个五维函数，本身难以烘焙。因此本文考虑对算子 $cal(K)$ 做低秩分解，分别计算和位置与角度有关的特征，最后组合出辐射值。低秩分解的思路是只求出和光源方向相同方向上的散射值（称为隐空间特征，这样就只需要烘焙和位置相关的特征 $cal(L)(p)$），然后再用 view modifier $cal(V)(omega)$ 微调到实际角度的情形。
+
+$
+cal(S):(sum_(l=0)^K n_l (p)sum_(m=-l)^l cal(L)_l^m (p) Y_l^m (omega_s), cal(V)(omega)) -> sum_(l=0)^l n_l (p) sum_(m=-l)^l L_l^m (p,omega_s) Y_l^m (omega)
+$
+
+为了保证渲染的效果和效率，最后喂给网络的特征除了有隐空间特征、view modifier 外，还有沿光源采样的基础网格特征 $cal(B)$（烘焙进网格中，用于替代沿路多次估计 $cal(L)$）和透射率分布特征 $cal(T)$，以及在邻域局部采样的相函数特征 $cal(G)$ 和 Albedo 特征 $cal(A)$. 从各个 Mipmap 层 $i$ 采样到的特征最后拼接成送进网络的特征 $cal(F)$. 因为这些特征已经很能概括散射了，所以网络只需要用一个简单的残差连接轻量 MLP。
+$
+cal(F)_i (p,omega)=(& cal(B)_i (p_i), sum_(l=0)^K g(p)^l sum_(m=-l)^l cal(L)_(i,l)^m (p) Y_l^m (omega_s), cal(V)_i (omega),\ & cal(G)_i (g(p),cos theta), cal(A)_i (alpha(p,omega),cos theta),[cal(T)_i (p_j, omega_s)]_(j=1)^M_2)
+$
+和 MRPNN 相同，把这个特征送进和场景无关的预训练 MLP 即可得到每个点的散射。
+
+#table(columns:4)[比较维度][MRPNN][MRBNN][性能提升原因][网络参数量][49.7 K][28.5 K][网络规模缩小近一倍，且使用了全融合架构。][采样元素量][480 个][432 个][减少了高维 SH 系数的重复访问。][输入维数][480+][64][烘焙了物理先验，且逐层补充信息。][推理耗时][\~19.0 ms][\~0.753 ms][参数量减小、维度降低、计算对角化。]
+
+并且 MRBNN 的采样步骤更快，因为只需要采样一次球谐系数，其它采样均是在 Mipmap 网格中采样标量，不需要反复访问纹理。MRBNN 输入的特征维数也更小（因为在预计算过程中已经融入了很多物理计算过的内容）。MRBNN 采用的残差连接 MLP 比 MRPNN 用的 SE 架构更轻量。综上能达到 20 倍以上的实时渲染性能提升。
+
+这篇文章的许多细节和设计动机我还没有完全看懂，有时间找原作者聊聊。
+
+参与介质渲染和 MRPNN 是我在图形学科研上痛苦受挫的开始。回忆过去还是比较想哭。这几年的自己不可能想出这样的优化，尽管不该是因为我不够努力。
 
 = Monte Carlo PDE
 
 == Probe-based Walk on Spheres for Efficient Path Reusing
 #image("/images/sig26-paper-notes-1/WoP-teaser.png")
-#emph[自己的文章，嘿嘿]
+#emph[我自己的文章。]
 
 利用路径信息重用高效优化 Walk on Spheres 系列算法。
 
@@ -509,7 +546,7 @@ NPR 与现代渲染方法结合的话，Neural 方法是难以建模一个相机
   image("/images/sig26-paper-notes-1/wop_algorithm.png"),
 ) <fig-wop-algorithm>
 
-当时这篇文章的 idea 成形已经是 11 月底了，只有两个月的时间做，临近交稿的时候还有各种 ddl 和期末考试，压力巨大。还好做完了，如果再晚半年就要和这些新的方差缩减算法比了，甚至要和 Best Paper 比，好可怕。
+当时这篇文章的 idea 成形已经是 11 月底了，只有两个月的时间做，临近交稿的时候还有各种 ddl 和期末考试，压力巨大。还好做完了，如果再晚半年就要和这些新的方差缩减算法比了，甚至要和 Best Paper 比，好可怕。今后还会继续做 Monte Carlo PDE 吗，不知道，既然能有想法就去做吧。
 
 == Walk on Decomposed Subdomains: A Hybrid Monte Carlo–Deterministic Solver for Elliptic PDEs @wods [#link("https://clementjambon.github.io/wods/index.html", "Project")]
 #image("/images/sig26-paper-notes-1/wods.png")
