@@ -79,6 +79,12 @@ url = "/friends/"
 weight = 40
 
 [[menu.main]]
+identifier = "学术"
+name = "学术"
+url = "https://rubatotree.github.io/academic/"
+weight = 45
+
+[[menu.main]]
 identifier = "搜索"
 name = "搜索"
 url = "/search/"
