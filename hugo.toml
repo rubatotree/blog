@@ -15,6 +15,8 @@ ShowToc = true
 math = true
 comments = true
 
+images = ["images/og-default.png"]
+
 [params.homeInfoParams]
 Title = "欢迎来到雨伞咖啡店！☕☂️"
 Content = """

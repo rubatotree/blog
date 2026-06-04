@@ -1,0 +1,42 @@
+{{- $ogImage := "" -}}
+
+{{- /* 优先级 1: 文章 cover.image */ -}}
+{{- if .Params.cover.image -}}
+  {{- if (ne .Params.cover.relative true) -}}
+    {{- $ogImage = .Params.cover.image | absURL -}}
+  {{- else -}}
+    {{- $ogImage = (path.Join .RelPermalink .Params.cover.image) | absURL -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 优先级 2: 文章 thumbnailImage (兼容旧写法) */ -}}
+{{- if and (not $ogImage) .Params.thumbnailImage -}}
+  {{- $ogImage = (printf "%s%s" (absURL "images") .Params.thumbnailImage) -}}
+{{- end -}}
+
+{{- /* 优先级 3: 文章 images 参数 */ -}}
+{{- if and (not $ogImage) .Params.images -}}
+  {{- $img := index .Params.images 0 -}}
+  {{- $url := urls.Parse $img -}}
+  {{- if eq $url.Scheme "" -}}
+    {{- $ogImage = $img | absURL -}}
+  {{- else -}}
+    {{- $ogImage = $img -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 优先级 4: 全局默认图片 */ -}}
+{{- if and (not $ogImage) site.Params.images -}}
+  {{- $ogImage = (index site.Params.images 0) | absURL -}}
+{{- end -}}
+
+{{- if $ogImage -}}
+<meta property="og:image" content="{{ $ogImage }}">
+<meta name="twitter:image" content="{{ $ogImage }}">
+<meta name="twitter:card" content="summary_large_image">
+{{- end -}}
+
+{{- /* 自定义 description 时补充 og:description (覆盖 PaperMod 默认的 summary 截断) */ -}}
+{{- with .Description -}}
+<meta property="og:description" content="{{ . | plainify | htmlUnescape | trim }}">
+{{- end -}}

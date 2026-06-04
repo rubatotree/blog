@@ -9,6 +9,8 @@
   date: datetime.today(),
   weight: 10,
   draft: false,
+  // cover image for social sharing (og:image)
+  coverImage: none,
   // outline(title: none)
   toc: true,
   // set text(lang: lang, region: region)
@@ -19,7 +21,7 @@
   body,
   ..args,
 ) = {
-  let prelude = metadata((
+  let meta = (
     title: title,
     description: description,
     tags: tags.values().map(ts => (ts,)).flatten(),
@@ -27,7 +29,11 @@
     weight: weight,
     draft: draft,
     ..args.named(),
-  ))
+  )
+  if coverImage != none {
+    meta.cover = (image: coverImage)
+  }
+  let prelude = metadata(meta)
 
   // custom front matter for Typst
   prelude
