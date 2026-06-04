@@ -94,7 +94,7 @@
 
 = 1. Monte Carlo PDE
 
-== Probe-based Walk on Spheres for Efficient Path Reusing
+== Probe-based Walk on Spheres for Efficient Path Reusing [#link("https://t7imal.github.io/projects/2026wop/", "Project")]
 #image("/images/sig26-paper-notes/WoP-teaser.png")
 #emph[我自己的文章。]
 
