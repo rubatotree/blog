@@ -10,6 +10,14 @@
   ),
   draft: false,
   references: ```bib
+@misc{yamashita2026chokaguyahime,
+  author       = {山下清悟},
+  title        = {超かぐや姫！},
+  howpublished = {Netflix},
+  year         = {2026},
+  note         = {アニメーション映画。監督：山下清悟。制作：STUDIO COLORIDO、STUDIO CHROMATO、ツインエンジン。2026年1月22日配信},
+  url          = {https://www.netflix.com/title/81756595}
+}
 @misc{park2026rendermemrenderingspatialmemory,
       title={RenderMem: Rendering as Spatial Memory Retrieval}, 
       author={JooHyun Park and HyeongYeop Kang},
@@ -54,7 +62,7 @@
 )
 
 #figure(
-  caption: "玩音乐的最终归宿是转行具身智能。",
+  caption: "玩音乐的最终归宿是转行具身智能。" + cite(<yamashita2026chokaguyahime>),
   image("/images/embodied-notes-2/teaser.png"),
 ) <fig-robosplat-teaser>
 
