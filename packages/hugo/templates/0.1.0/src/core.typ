@@ -48,6 +48,9 @@
   set text(size: 13.5pt)
   set text(lang: lang, region: region)
 
+  // Set font for math equations: math font for symbols, Noto Serif CJK SC Light for Chinese
+  show math.equation: set text(font: ("New Computer Modern Math", "Noto Serif CJK SC", "KaiTi"), weight: "light")
+
   // rewrite some built-in functions to better support HTML output
   show h: h-func
   show v: v-func
