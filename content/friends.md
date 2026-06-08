@@ -24,6 +24,15 @@ url = "https://rinevard.github.io/"
 github = "rinevard"
 
 [[friends]]
+name = "megakite.icu"
+description = """
+megakite
+技术与艺术 编译原理，计算机系统
+"""
+url = "https://megakite.icu/"
+github = "megakite"
+
+[[friends]]
 name = "KillerAery"
 description = """
 Aery老师 USTC游戏开发头子（？
@@ -51,13 +60,22 @@ url = "https://featherp.com/"
 github = "Feather-P"
 
 [[friends]]
+name = "Hineven的博客"
+description = """
+Hineven 学长
+计算机图形学 技术，涂鸦，文字
+"""
+url = "http://hineven.site/"
+github = "hineven"
+
+[[friends]]
 name = "the homepage of Eastwind"
 description = """
 Eastwind 离散数学系列助教
 数学笔记，游戏设计等
 """
 url = "http://home.ustc.edu.cn/~eastwind/"
-avatar = "http://home.ustc.edu.cn/~eastwind/images/profile_square.jpg"
+github = "EastwindBonker"
 
 +++
 

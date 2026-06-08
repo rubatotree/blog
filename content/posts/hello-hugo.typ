@@ -29,5 +29,5 @@
 
 #figure(
   caption: "你好，世界！",
-  image("/images/helloworld.jpg"),
+  image("/images/hello-hugo/helloworld.jpg"),
 ) <fig-maomao>

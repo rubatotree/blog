@@ -17,6 +17,11 @@ comments = true
 
 images = ["images/og-default.png"]
 
+[params.assets]
+favicon = "favicon.ico"
+favicon16x16 = "favicon.ico"
+favicon32x32 = "favicon.ico"
+
 [params.homeInfoParams]
 Title = "欢迎来到雨伞咖啡店！☕☂️"
 Content = """
@@ -49,7 +54,9 @@ url = "https://space.bilibili.com/3494360710646642"
 
 [[params.socialIcons]]
 name = "Xiaohongshu"
+icon = "xiaohongshu"
 url = "https://www.xiaohongshu.com/user/profile/653b6aeb000000000301d9ed"
+
 
 [markup.typst]
 root = "./content"
