@@ -1,0 +1,41 @@
+/* 移动端字体优化 */
+@media screen and (max-width: 768px) {
+    /* 正文字体大小 */
+    body {
+        font-size: 16px;
+    }
+
+    /* 标题字体调整 */
+    .md-content h1 {
+        font-size: 28px;
+        margin: 32px auto 24px;
+    }
+
+    .md-content h2 {
+        font-size: 24px;
+        margin: 24px auto 18px;
+    }
+
+    .md-content h3 {
+        font-size: 20px;
+    }
+
+    .md-content h4 {
+        font-size: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+
+    /* 代码块字体 */
+    .post-content code {
+        font-size: 0.8em;
+    }
+
+    /* 行高优化 */
+    .md-content p,
+    .md-content li {
+        line-height: 1.5;
+    }
+}
