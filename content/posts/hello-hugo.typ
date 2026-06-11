@@ -3,7 +3,7 @@
 
 #show: article.with(
   title: "Hello, World!",
-  date: datetime(year: 2026, month: 5, day: 10),
+  date: datetime(year: 2022, month: 7, day: 30),
   weight: 0,
   tags: (
     category: "漫谈"
@@ -17,7 +17,6 @@
     date: 2023
     url:
       value: https://george.honeywood.org.uk/blog/typst-and-hugo/
-      date: 2026-03-29
   ```,
 )
 
@@ -31,3 +30,5 @@
   caption: "你好，世界！",
   image("/images/hello-hugo/helloworld.jpg"),
 ) <fig-maomao>
+
+本页面实际构建日期为 2026 年 5 月 11 日，为了同步一些早期的文章同时保持次序，将本文章的发布日期设置在了一个有意义的日子。

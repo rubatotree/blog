@@ -3,7 +3,7 @@
 
 #show: article.with(
   title: "实分析 课程总结笔记",
-  date: datetime(year: 2026, month: 5, day: 11),
+  date: datetime(year: 2025, month: 6, day: 10),
   weight: 0,
   tags: (
     category: ("数学", "分析", "课程笔记")

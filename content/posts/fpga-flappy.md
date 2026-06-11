@@ -1,6 +1,6 @@
 ---
 title: 用 FPGA 写 Flappy Bird
-date: 2026-05-11
+date: 2025-01-10
 tags:
 - 游戏开发
 - 计算机体系结构
