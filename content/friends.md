@@ -77,6 +77,15 @@ Eastwind 离散数学系列助教
 url = "http://home.ustc.edu.cn/~eastwind/"
 github = "EastwindBonker"
 
+[[friends]]
+name = "犬窝闲谭"
+description = """
+And miles to go before I sleep
+文字等
+"""
+url = "https://inuebisu.cn"
+avatar = "https://inuebisu.cn/avatar.png"
+
 +++
 
 这里是我所珍视的好朋友们的博客链接——

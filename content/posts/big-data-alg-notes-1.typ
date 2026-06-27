@@ -1,3 +1,4 @@
+
 #import "@hugo/templates:0.1.0": article
 #import "@hugo/utils:0.1.0": *
 
@@ -184,3 +185,9 @@ $
 为了保证梯度下降符合预期，人们提出了各种正则化策略，如 Ridge Regression（L2 正则化，=Weight Decay，解决多重共线性问题），Lasso 正则化（L1 正则化）。这些正则化策略能惩罚大的系数，让模型不仅尽可能拟合数据，还要尽量简单（“奥卡姆剃刀”），以减少过拟合风险。可以用偏差-方差分解理论解释（将一部分方差转化为偏差），也可以用贝叶斯先验（认为系数不应过大）解释。
 
 一般的梯度下降方法形式为：$h^((0)) in RR^d, h^((k+1)) = h^((k)) - gamma_k nabla f(h^((k)))$，终止条件为 $norm(nabla f(h^((k)))) < epsilon$（注意该终止条件在一些鞍点上也被满足，这是非预期的情形）。其收敛依赖于 Lipschitz 假设和强凸性。
+
+- SGD $ theta_(t+1)=theta_t - eta dot g_t $ 直接沿着最速梯度下降方向更新。缺陷是容易在鞍点震荡、对全局学习率敏感。
+- Momentum $ v_0=0, quad v_t=gamma v_(t-1)+eta dot g_t,quad theta_(t+1)=theta_t - v_t $ 引入了动量（惯性）机制，以减少方向上的震荡、达到更稳定的优化，解决了鞍点及震荡的问题。
+- Adagrad $ G_t=G_(t-1)+g_t dot.o g_t ,quad theta_(t+1)=theta_t - eta/sqrt(G_t + epsilon) dot.o g_t $ 引入了自适应学习率机制，通过累积历史梯度的平方来调整每个参数的学习率，适合稀疏数据，但可能导致学习率过早衰减。
+- RMSProp $ v_1=g_0 dot.o g_0, quad v_t=gamma v_(t-1)+(1-gamma)g_t dot.o g_t,quad theta_(t+1)=theta_t - eta/sqrt(v_t + epsilon) dot.o g_t $ 引入了指数加权移动平均机制，使得算法只受近期梯度幅度影响，解决了 Adagrad 学习率过早衰减的问题，适合非平稳目标。
+- Adam $ m_0=0,quad v_0=0, quad \ m_t=beta_1 m_(t-1)+(1-beta_1)g_t,quad v_t=beta_2 v_(t-1)+(1-beta_2)g_t dot.o g_t,\ hat(m)_t=m_t/(1-beta_1^t),quad hat(v)_t=v_t/(1-beta_2^t),\ theta_(t+1)=theta_t - eta/sqrt(hat(v)_t + epsilon) dot.o hat(m)_t $ 结合了 动量 + 自适应缩放 + 偏置校正机制，适用于大多数优化问题，具有较快的收敛速度和较好的性能表现。

@@ -65,5 +65,3 @@
   caption: "玩音乐的最终归宿是转行具身智能。" + cite(<yamashita2026chokaguyahime>),
   image("/images/embodied-notes-2/teaser.png"),
 ) <fig-robosplat-teaser>
-
-TODO
