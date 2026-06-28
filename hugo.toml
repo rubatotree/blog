@@ -1,5 +1,6 @@
 baseURL = 'https://rubatotree.github.io/blog/'
 locale = 'en-us'
+haveCJKLanguage = true
 timeZone = 'Asia/Shanghai'
 title = "Umbrella Coffee"
 theme = 'PaperMod'
