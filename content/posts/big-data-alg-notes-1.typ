@@ -136,13 +136,67 @@ $
 
 = 8 最优传输
 
-#let inner(x,y) = $angle.l #x,#y angle.r$
+#let inner(a, b) = $chevron.l #a, #b chevron.r$
+#let outer(a, b)= $#a and #b$
 
 问题形式：有两个离散归一化分布向量 $r in RR_+^n, c in RR_+^m$，成本矩阵（“距离”）$C in RR_+^(n times m)$，目标是找到一个传输计划（“耦合”）矩阵 $P in RR_+^(n times m)$ 满足 $P bold(1)=r, P^T bold(1)=c$（记这类矩阵集合为 $U(r,c)$），最小化总运输成本 $L_C (r,c)=min_(P in U(r,c)) inner(P, C)$.
 
 即：找到一个从分布 $r$ 到分布 $c$ 的最优传输计划 $P$，使得运输成本（由成本矩阵 $C$ 定义）最小。
 
-熵正则化：TODO
+原始问题是一个维数极高的线性规划问题，直接求解非常困难，因此考虑引入熵正则化，用参数 $lambda$ 控制 $P$ 趋向离散或者均匀分布，同时将问题转化为凸优化问题。熵的定义如下：
+$
+H(P)=-sum_(i, j) P_(i j) (log P_(i j)-1)
+$
+熵正则化的最优传输问题为：
+$
+L_C^lambda (r,c)=min_(P in U(r,c)) F(P)=min_(P in U(r,c)) inner(P, C)-lambda H(P)
+$
+则对能量求导得到最优化条件
+$
+(partial F)/(partial P_(i j))=C_(i j)+lambda log P_(i j)=0 => P_(i j)=exp(-C_(i j)/lambda)
+$
+
+Sinkhorn 算法：从初值 $u^(0), v^(0)=bold(1)$ 简单迭代至符合约束条件的解。“在不破坏 $K$ 内部相对能量比例的前提下，寻找一组最优雅的‘局部变形力’ $u$ 和 $v$，将 $K$ 扣入边界约束中”。
+1. 计算 Gibbs 核矩阵 $K=exp(-C/lambda)$
+2. 初始化 $v^(0)=bold(1)$
+3. 迭代更新：
+   - $u^((l+1))=r\/(K v^((l)))$
+   - $v^((l+1))=c\/(K^T u^((l+1)))$
+收敛结果为 $u^*, v^*$，令 $P^*="diag"(u^*)K"diag"(v^*)$，即 $P^*_(i j)=u_i v_j K_(i j)$. 由上面迭代更新的条件可以知道，收敛时满足
+$
+u^*=r\/(K v^*),quad v^*=c\/(K^T u^*) quad=>quad u^* dot.o K v^*=r, quad v^* dot.o K^T u^*=c
+$
+故可以验证 $P^*$ 的确符合传输计划约束：
+$
+P^* bold(1)=u^* dot.o K v^* = r,quad (P^*)^T bold(1)=v^* dot.o K^T u^* = c
+$
+关于最优性，需要先证明问题等价于最小化 $"D"_("KL")(P||K)$：
+$
+"D"_("KL")(P||K)
+&=sum_(i, j) P_(i j) log(P_(i j)/K_(i j))-sum_(i, j) P_(i j)+sum_(i, j) K_(i j)\
+&=sum_(i, j) P_(i j) (log P_(i j)+C_(i j)/lambda)-sum_(i, j) P_(i j)+sum_(i, j) K_(i j)\
+&=(1/lambda inner(P, C)-H(P))+sum_(i, j) K_(i j)\
+&=1/lambda F(P)+"const"
+$
+利用传输计划约束可以证明：
+$
+sum_(i,j)P^*_(i j)log P_(i j)^* /K_(i j)=sum_(i,j)P_(i j)log P_(i j)^* /K_(i j)=sum_i r_i log u^*_i + sum_j c_j log v^*_j
+$
+从而可以得到毕达哥拉斯等式：
+$
+&"D"_("KL")(P||K)-"D"_("KL")(P^*||K)\
+=&(sum_(i, j) P_(i j) log(P_(i j)/K_(i j))-sum_(i, j) P_(i j)+sum_(i, j) K_(i j))-(sum_(i,j)P^*_(i j)log P_(i j)^* /K_(i j)-sum_(i,j)P^*_(i j)+sum_(i,j)K_(i j))\
+=&(sum_(i, j) P_(i j) log(P_(i j)/K_(i j))-sum_(i, j) P_(i j)+sum_(i, j) K_(i j))-(sum_(i,j)P_(i j)log P_(i j)^* /K_(i j)-sum_(i,j)P^*_(i j)+sum_(i,j)K_(i j))\
+=&sum_(i, j) P_(i j) log(P_(i j)/P^*_(i j))-sum_(i, j) P_(i j)+sum_(i, j) P^*_(i j)\
+=&"D"_("KL")(P||P^*) >= 0
+$
+即 $"D"_("KL")(P^*||K)<="D"_("KL")(P||K), forall P in U(r,c)$，证明了 $P^*$ 是最优解。
+
+此外，#link("../big-data-alg-notes-3/#loc-30", "作业三第 5 题") 给出了一种基于拉格朗日乘子法的证明。
+
+熵正则化解的传输成本部分称为 Sinkhorn 距离 $d_(C, lambda)(r,c)=inner(P^lambda, C)_F$。
+- Sinkhorn 距离是真实 OT 距离的一个通常更大的近似。
+- 较小的 $lambda$ 意味着近似更精确，但迭代次数更多、数值更易不稳定；较大的 $lambda$ 会使解更均匀粗糙“模糊”、但求解更加稳定。
 
 应用：
 - 生成式模型：Flow Matching, Diffusion Model.
@@ -152,7 +206,78 @@ $
 
 = 9 分布式算法
 
+Google提出的MapReduce模型是分布式计算的经典框架，适用于TB甚至PB级数据的并行处理。其核心
+流程包括：
+1. 数据划分：将输入数据拆分为多个块（split)，分配给不同的 Mapper 节点;
+2. Map 阶段：每个 Mapper 执行用户定义的Map函数，产生若干 $("key", "value")$ 对；
+3. Shuffle 阶段：系统自动将相同 $"key"$ 的数据发送到同一Reducer节点；
+4. Reduce 阶段：Reducer 对相同 $"key"$ 的数据进行聚合处理；
+5. 结果输出：输出结果存储到分布式文件系统（如 HDFS）。
+
+讲义举例的分布式算法有：
+- 分布式 $k"-center"$ 聚类：中心化贪心算法为 $2"-"$近似；采用分布节点-中心节点两阶段的贪心算法仍能保持常数级别 $4"-"$近似。
+- 分布式 PCA 降维。
+- 分布式 PageRank：瓶颈在跨机器边的通信。
+- 分布式机器学习训练。
+- 联邦学习。
+- 分布式重心估计：用随机二值量化方法压缩通信量。
+
 = 10 Beyond worst case analysis
+
+BWCA 是从实际问题特征出发研究算法的复杂度的方法，通常基于对问题的结构化假设，分析算法在这些假设下的性能。BWCA 的目标是设计出在实际问题中表现良好的算法，而不仅仅是针对最坏情况的理论分析。常见的假设有：
+- 稳定性：假设问题实例的最优解在输入数据的微小扰动下不会发生显著变化。
+- 分离性：不同簇之间的距离足够大，使得簇结构明显。
+- 扰动弹性：假设问题实例在面对随机扰动时仍然能够保持一定的性能。
+- 平滑分析：允许对输入数据进行小幅随机扰动，并分析扰动后的期望运行时间。
+
+== 良好分离性下的 $k"-means"$
+
+$k"-means"$ 是 BWCA 的经典研究对象。
+
+我们定义一个集合 $X$ 是 $epsilon"-Seperated"$，当 $Delta^2_k (X)<=epsilon^2 Delta^2_(k+1) (X)$，即 $X$ 明显地有 $k$ 个簇。
+
+关于重心和 $1"-means" $能量（有“方差”意义）有如下引理：
+1. 期望两两平方距离：$sum_(x, y in X) norm(x-y)^2=2n Delta_1^2 (X)$
+2. 全方差公式（方差分解）：$Delta_1^2 (X)=Delta_1^2 (X_1)+Delta_1^2 (X_2)+(n_1 n_2)/n norm(mu_1-mu_2)^2$
+3. 条件均值偏离不等式：$norm(mu(X_1)-mu(X))^2 <= (Delta_1^2 (X))/n dot n_2/n_1$
+
+$epsilon"-"$分离性假设下的 $2"-means"$ 算法：
+1. 按 $norm(x-y)^2$ 权重采样一对点 $(hat(mu)_1, hat(mu)_2)$.
+2. 在以 $hat(mu)_i$ 为球心、半径为 $r=norm(hat(mu)_2-hat(mu)_2)\/3$ 的球内再计算一次质心 $overline(mu)_i$ 作为最终聚类中心。
+算法求得的聚类代价最多为 $(Delta_2^2 (X))/(1-rho)$，且以至少 $1-O(rho)$ 概率成功，$rho=(100 epsilon^2)/(1-epsilon^2)$。
+
+算法的时间复杂度为 $O(n d)$，其中采样步可以拆成以下两步：
+- 按 $(sum_(y in X) norm(x-y)^2)/(sum_(x, y in X) norm(x-y)^2)=(Delta_1^2 (X)+n norm(x-mu(X))^2)/(2n Delta_1^2 (X))$ 权重采样 $x$（预计算 $Delta_1^2 (X)$）.
+- 按 $norm(y-hat(mu)_1)^2/(Delta_1^2 (X)+n norm(mu(X)-hat(mu)_1)^2)$ 权重采样 $y$.
+
+误差证明 TODO。
+
+对于 $k"-means"$，算法的流程是这样的：
+1. 先按 $norm(x-y)^2$ 权重采样一对点 $(hat(mu)_1, hat(mu)_2)$，然后用类似 $k"-means"$++ 的方式迭代采样 $k-2$ 个点，得到 $k$ 个初始聚类中心。
+2. 有 Ball-k-means 和 Centroid Estimation 两种方式优化中心：
+  - Ball-k-means：在 $hat(d)_i\/3$ 球内重建中心。时间复杂度 $O(n k d+k^3 d)$，成功概率 $1-O(sqrt(epsilon))$，代价不超过 $(1-epsilon^2)/(1-37 epsilon^2) Delta_k^2 (X)$.
+  - Centroid Estimation：在扩展 Voronoi cell 内采样子集，在子集内再筛选一次子集，取最优中心。在 $O(2^(O(k(1+epsilon^2)\/omega))n d)$ 时间内以常数概率返回一个 $(1+omega)"-"$近似解。
+
+== 压缩感知
+
+考虑到许多实际信号（图片、声音、文字）等在语义空间中维度实际上会小很多，我们会考虑将实际信号编码进性质良好的低维隐空间中进行处理，且要求能从隐空间恢复出良好的信号，这就引出了压缩感知(Compressed Sensing)问题。
+
+设计合适的 Encoder $Phi$ 和 Decoder $Delta$，使得最大压缩误差 $max_(x in RR^d) norm(Delta(Phi x)-x)_2^2$ 最小。
+
+其中 $x in RR^d$ 为实际信号，$y=Phi x in RR^N$ 为我们对该信号的测量/压缩信号/隐空间向量/特征向量。
+
+我们可以假设 $x$ 的稀疏性先验设计压缩感知方法：
+
+- 稀疏性：$x$ 为 $k$ 稀疏当 $x$ 仅有 $k<<d$ 个非零分量。（$l_0$ 范数不大于 $k$）
+- 限制等距性质(RIP)：$forall norm(x)_0<=k, exists epsilon in (0,1) "s.t." (1-epsilon) norm(x)_2^2 <= norm(Phi x)_2^2 <= (1+epsilon) norm(x)_2^2$.
+
+若 $Phi$ 满足 RIP，则 $Delta(y)=min norm(x)_1 "s.t." Phi x = y$ 是一个良好的解码器，误差满足 $norm(x-Delta Phi x)_2<=(C dot norm(x)_1)/sqrt(k)$.
+
+利用生成模型可以不必假设信号分量的稀疏性。基于用生成模型 $G$ 建模高维信号的先验分布流形，可以这样设计解码器：
+$
+Delta(y)=G(z^*), "s.t." z^*=arg min_(z) (norm(Phi G(z)-y)_2^2 +lambda norm(z)_2^2)
+$
+使用生成模型进行建模依赖于生成模型的表达能力。
 
 = 11 SGD 随机梯度下降
 

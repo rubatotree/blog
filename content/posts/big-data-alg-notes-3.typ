@@ -526,8 +526,7 @@ $
 
 == 作业四 第4题
 
-#image("/images/big-data-alg-notes/hw4-q4-1.png", width: 90%)
-#image("/images/big-data-alg-notes/hw4-q4-2.png", width: 90%)
+#image("/images/big-data-alg-notes/hw4-q4.png", width: 90%)
 
 === 解答
 
@@ -559,8 +558,9 @@ theta_(t+1)=theta_t - eta((theta_1/norm(theta)_p)^(p-1),...,(theta_d/norm(theta)
 $
 
 == 作业四 第5题
+#image("/images/big-data-alg-notes/hw4-q5-1.png", width: 90%)
 
-#image("/images/big-data-alg-notes/hw4-q5.png", width: 90%)
+#image("/images/big-data-alg-notes/hw4-q5-2.png", width: 90%)
 
 === 解答
 
@@ -618,3 +618,22 @@ min_(z in RR^k) norm(y-Phi G(z))_2^2
 $
 $l_1$ 最小化恢复形式实际上假设的是 $x$ 有较多零元素（稀疏性），从而恢复的结果也应当有尽可能小的 $l_1$ 范数。而生成模型假设对 $x$ 的分布有更好的先验，对采样率要求更低，但受限于生成模型的表达能力，可能无法准确恢复 $x$.
 
+== 2025 年期末考试 第 4 题
+
+#image("/images/big-data-alg-notes/2025fin-q4.png", width: 90%)
+
+=== 解答
+
+考虑递归地覆盖集合 $X$ 以得到足够小以能划分所有元素的簇。
+
+每次递归地将集合覆盖成 $2^m$ 个直径不超过原来一半的子集，则经过 $ceil(log(Delta))$ 次划分后，将得到 $2^(m ceil(log(Delta)))=Delta^O(m)$ 个子集，所有子集的直径不超过 $min_(x != y in X) d(x,y)$，因此每个子集最多包含一个元素。
+
+从而可以自然地导出不等式 $abs(X)<=Delta^O(m)$.
+
+== 2025 年期末考试 第 5 题
+#image("/images/big-data-alg-notes/2025fin-q5.png", width: 90%)
+=== 解答
+$
+c_i=1/n_i sum_(x_j in X_i) x_j => n_i c_i=sum_(x_j in X_i) x_j => n_1 c_1+n_2 c_2=(n_1+n_2) c
+$
+这是线性插值形式，自然满足重心共线.
