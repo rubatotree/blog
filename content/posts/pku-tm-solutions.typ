@@ -1,0 +1,479 @@
+#import "@hugo/templates:0.1.0": article
+#import "@hugo/utils:0.1.0": *
+
+#show: article.with(
+  title: "北京大学 2023-2025 推免机试题笔记",
+  date: datetime(year: 2026, month: 6, day: 29),
+  weight: 0,
+  tags: (
+    category: ("TCS", "题解")
+  ),
+  draft: false,
+  references: ```bib
+  ```,
+)
+
+#let Var = "Var"
+#let inner(a, b) = $chevron.l #a, #b chevron.r$
+#let outer(a, b)= $#a and #b$
+
+北京大学计算机学院推免夏令营机考为 ACM 赛制，时长 2 小时，每场共 8 题，题目可能是中文或英文，部分题目（主要是英文题）选自 OJ 中已有的题目。题目不按难度排序，整体难度在 CF Div4（大部分题）到 Div2 D（1\~2题） 之间，能切 Div2 D 的同学可以放心考试。据说实际不爆零就能通过。
+
+有意向报考北大计算机学院研究生的同学可以提前准备刷题。
+
+= 题源整理
+
+== 2025 #link("http://bailian.openjudge.cn/tm2025cs/", "比赛（无数据）")
+- #link("http://bailian.openjudge.cn/practice/2992/","A. Lab 杯") 
+- #link("http://bailian.openjudge.cn/practice/2976/","B. All in All")
+- #link("http://bailian.openjudge.cn/tm2025cs/C/","C. 表达式求值") （无数据）
+- #link("http://bailian.openjudge.cn/tm2025cs/D/","D. 忍者道具") （无数据）
+- #link("http://bailian.openjudge.cn/tm2025cs/E/","E. 神奇的数列") （无数据）
+- #link("http://bailian.openjudge.cn/practice/2994/","F. 拼装模型")
+- #link("http://bailian.openjudge.cn/practice/2367/","G. Genealogical Tree")
+- #link("http://bailian.openjudge.cn/tm2025cs/H/","H. 怀表问题") （无数据）
+
+== 2024 #link("http://bailian.openjudge.cn/tm2024cs/", "比赛（无数据）")
+- #link("http://bailian.openjudge.cn/tm2024cs/A/", "A. 字符串中最长的连续出现的字符") （无数据）
+- #link("http://bailian.openjudge.cn/practice/4133/", "B. 垃圾炸弹")
+- #link("http://bailian.openjudge.cn/tm2024cs/C/", "C. 传送法术") （无数据）
+- #link("http://bailian.openjudge.cn/tm2024cs/D/", "D. 电影院排座") （无数据）
+- #link("http://bailian.openjudge.cn/practice/2002/", "E. 正方形")
+- #link("http://bailian.openjudge.cn/practice/1240/", "F. Pre-Post-erous!")
+- #link("http://bailian.openjudge.cn/practice/1789/", "G. Truck History")
+- #link("http://bailian.openjudge.cn/practice/2449/", "H. Remmarguts' Date")
+
+== 2023 #link("http://bailian.openjudge.cn/tm2023cs/", "比赛（无数据）")
+- #link("http://bailian.openjudge.cn/practice/1936/", "A. 全在其中")
+- #link("http://bailian.openjudge.cn/tm2023cs/B/", "B. 最接近的分数") （无数据）
+- #link("http://bailian.openjudge.cn/practice/4103/", "C. 踩方格")
+- #link("http://bailian.openjudge.cn/tm2023cs/D/", "D. 核电站") （无数据）
+- #link("http://bailian.openjudge.cn/tm2023cs/E/", "E. 合法出栈序列") （无数据）
+- #link("http://bailian.openjudge.cn/tm2023cs/F/", "F. 海盗船") （无数据）
+- #link("http://bailian.openjudge.cn/practice/2485/", "G. Highways")
+- #link("http://bailian.openjudge.cn/practice/1684/", "H. Dynamic Declaration Language (DDL)")
+
+下文为我个人编写的题解，无数据的题不保证正确，欢迎在评论区中反馈。按题目难度排序。
+
+= 2025 题解
+
+个人向难度排序：A < B < F < D < (Div4) < G < E < (Div2 C) < C < H < (Div2 D)。
+
+== A. Lab 杯：模拟
+```cpp
+const int maxn = 100 + 10;
+
+int n, a[maxn][maxn];
+
+int main()
+{
+	scanf("%d", &n);
+	for(int r = 1; r <= n; r++)
+		for(int c = 1; c <= n; c++)
+			scanf("%d", &a[r][c]);
+	int k = 0, winmost = 0;
+	for(int r = 1; r <= n; r++)
+	{
+		int win = 0;
+		for(int c = 1; c <= n; c++)
+		{
+			if(a[r][c] >= 3)
+			{
+				win++;
+			}
+		}
+		if(win > winmost)
+		{
+			winmost = win;
+			k = r;
+		}
+	}
+	printf("%d\n", k);
+	return 0;
+}
+```
+== B. All in All：简单字符串
+```cpp
+const int maxn = 100000 + 10;
+
+char s[maxn], t[maxn];
+
+int main()
+{
+	while(true)
+	{
+		scanf("%s %s", s, t);
+		if(s[0] == '\0') break;
+		int p = 0;
+		int lens = strlen(s), lent = strlen(t);
+		for(int i = 0; i < lent; i++)
+		{
+			if(t[i] == s[p])
+				p++;
+			if(p == lens) break;
+		}
+		printf(p == lens ? "Yes\n" : "No\n");
+
+		s[0] = '\0';
+		t[0] = '\0';
+	}
+	return 0;
+}
+
+```
+== C. 表达式求值：较复杂的模拟；编译原理
+
+编译原理题。
+
+有点懒得写编译原理那套 LL/LR 文法，干脆直接对栈内状态做一些假设：栈顶端的值一旦能确定就马上确定，直到无法确定是否会受到新加入的值影响为止。我们分析一下布尔表达式：
+- 遇到 `)` 时，直到最近的 `(` 内的值都不会受到后续值影响了，应立即 collapse 到一个布尔值。处理完这一步后，我们消去了栈顶的所有括号，栈顶一定是一个布尔值 `var` ，栈顶的前一个符号一定是运算符 `symbol`，或者左括号 `(`，或者是空值 `NULL`。如果是空值意味着运算已经结束；如果是左括号就意味着需要继续接受符号。
+- 此时当 `symbol == !` 时，`!var` 值可以直接确定，不受后续影响，直接 collapse 栈顶的布尔值 `var` 到 `!var`，并将栈顶的 `!` 和 `var` 消去。此后栈顶的前一个符号一定是 `&`, `|`, `(`, `NULL` 中的一个。
+- 由于此时表达式右部的优先级仅有 `& > |`，因此当前一个符号是 `&` 时，栈顶的布尔值 `var` 和栈顶的前一个布尔值 `var2` 可以直接 collapse 到 `var2 & var`，并将栈顶的 `&` 和两个布尔值消去。此后栈顶的前一个符号一定是 `|`, `(`, `NULL` 中的一个，一直向后处理直至读完或者遇到右括号，括号内的部分一定是 `var | var | var ...` 的形式，括号内的值可以直接简单 collapse 到一个布尔值。
+
+技巧是能够假设出一些好处理的栈状态。
+
+```cpp
+const int maxn = 100000 + 10;
+string line;
+char stk[maxn];
+int p = 0;
+bool tb(char c) { return c == 'V'; }
+bool isvf(char c) { return c == 'V' || c == 'F'; }
+char tc(bool b) { return b ? 'V' : 'F'; }
+void debug_stack()
+{
+	printf("stack: ");
+	for(int i = 0; i < p; i++)
+		printf("%c", stk[i]);
+	printf("\n");
+}
+int main()
+{
+	while(true)
+	{
+		getline(cin, line);
+		if(line[0] == '\0') break;
+		for(char c : line)
+		{
+			if(c == ' ') continue;
+			stk[p++] = c;
+			debug_stack();
+			if(stk[p - 1] == ')')
+			{
+				char ket_symbol = stk[--p];
+				bool final_bool = false;
+				char expect_symbol;
+				do
+				{
+					char var_symbol = stk[--p];
+					final_bool |= tb(var_symbol);
+					expect_symbol = stk[--p];
+				}
+				while(expect_symbol != '(');
+				stk[p++] = tc(final_bool);
+				debug_stack();
+			}
+			while(p >= 2 && isvf(stk[p - 1]) && stk[p - 2] == '!')
+			{
+				char var_symbol = stk[--p];
+				char not_symbol = stk[--p];
+				stk[p++] = tc(!tb(var_symbol));
+				debug_stack();
+			}
+			while(p >= 3 && isvf(stk[p - 1])  && stk[p - 2] == '&')
+			{
+				char b_symbol = stk[--p];
+				char and_symbol = stk[--p];
+				char a_symbol = stk[--p];
+				stk[p++] = tc(tb(a_symbol) && tb(b_symbol));
+				debug_stack();
+			}
+		}
+		bool final_bool = false;
+		for(int i = 0; i < p; i++)
+		{
+			if(stk[i] == 'V') final_bool = true;
+		}
+		printf("%c\n", tc(final_bool));
+		p = 0;
+		line[0] = '\0';
+	}
+	return 0;
+}
+```
+== D. 忍者道具：搜索
+看到数据范围 $N<=18$ 我们就知道可以枚举全排列。
+```cpp
+const int maxn = 100000 + 10, inf = 1 << 30;
+
+int n, w, c[maxn], vis[maxn];
+
+int dfs(int ci, int cw, int cm)
+{
+	vis[ci] = true;
+	if(cw >= c[ci])
+	{
+		cw -= c[ci];
+	}
+	else
+	{
+		cw = w;
+		cm++;
+	}
+	int ans = inf;
+	for(int i = 1; i <= n; i++)
+		if(!vis[i])
+			ans = min(dfs(i, cw, cm), ans);
+	vis[ci] = false;
+	return ans == inf ? cm : ans;
+}
+
+int main()
+{
+	scanf("%d%d", &n, &w);
+	for(int i = 1; i <= n; i++)
+		scanf("%d", &c[i]);
+	int ans = inf;
+	for(int i = 1; i <= n; i++)
+		ans = min(dfs(i, w, 1), ans);
+	printf("%d\n", ans);
+	return 0;
+}
+
+```
+== E. 神奇的数列：动态规划
+动态规划。考虑维护 `dp[l][r]` 表示区间 `[l, r]` 的最少操作数。我们可以考虑区间的两端：
+- 如果 `a[l] == a[r]`，则我们可以考虑将两端的相同元素一次解决，中间的区间 `[l', r']` 需要 `dp[l'][r']` 次操作，最终结果为 `dp[l'][r'] + 1`。
+- 如果 `a[l] != a[r]`，则我们可以枚举一个中间点 `mid`，将区间 `[l, r]` 分为 `[l, mid]` 和 `[mid + 1, r]` 两个子区间分别分解，最终结果为 `dp[l][mid] + dp[mid + 1][r]` 的最小值。
+因为懒得列方程所以就记忆化搜索解决了。
+```cpp
+const int maxn = 200 + 10, inf = 1 << 30;
+
+int n, a[maxn];
+int dp[maxn][maxn];
+
+int dfs(int l, int r)
+{
+	if(dp[l][r] != -1) return dp[l][r];
+	if(l == r) return dp[l][r] = 1;
+	if(a[l] == a[r])
+	{
+		int c = a[l];
+		int tl = l, tr = r;
+		while(tl <= tr && a[tl] == c) tl++;
+		while(tl <= tr && a[tr] == c) tr--;
+		if(tl > tr) return dp[l][r] = 1;
+		else return dp[l][r] = dfs(tl, tr) + 1;
+	}
+	dp[l][r] = inf;
+	for(int mid = l; mid <= r - 1; mid++)
+	{
+		dp[l][r] = min(dfs(l, mid) + dfs(mid + 1, r), dp[l][r]);
+	}
+	return dp[l][r];
+}
+
+int main()
+{
+	int t;
+	scanf("%d", &t);
+	for(int T = 1; T <= t; T++)
+	{
+		scanf("%d", &n);
+		for(int i = 1; i <= n; i++)
+			scanf("%d", &a[i]);
+		for(int i = 1; i <= n; i++)
+			for(int j = 1; j <= n; j++)
+				dp[i][j] = -1;
+		printf("Case %d: %d\n", T, dfs(1, n));
+	}
+	return 0;
+}
+```
+== F. 拼装模型：贪心
+每次取开销最小的两个模型拼接。
+```cpp
+const int maxn = 100000 + 10;
+int n;
+priority_queue<ll, vector<ll>, greater<ll>> q;
+
+int main()
+{
+    scanf("%d", &n);
+    for(int i = 1; i <= n; i++)
+    {
+        int x;
+        scanf("%d", &x);
+        q.push(x);
+    }
+    ll ans = 0;
+    while(q.size() > 1)
+    {
+        ll a = q.top(); q.pop();
+        ll b = q.top(); q.pop();
+        ans += a + b;
+        q.push(a + b);
+    }
+    printf("%lld\n", ans);
+    return 0;
+}
+```
+== G. Genealogical Tree：拓扑排序
+拓扑排序模板题。
+```cpp
+const int maxn = 100 + 10;
+int n;
+vector<int> es[maxn];
+int deg[maxn], vis[maxn], ans[maxn], p = 1;
+
+void dfs(int o)
+{
+    if(vis[o]) return;
+    vis[o] = true;
+    ans[p] = o;
+    p++;
+    for(int i = 0; i < es[o].size(); i++)
+    {
+        int v = es[o][i];
+        deg[v]--;
+        if(deg[v] == 0) dfs(v);
+    }
+}
+
+int main()
+{
+    scanf("%d", &n);
+    for(int i = 1; i <= n; i++)
+    {
+        deg[i] = 0;
+        vis[i] = false;
+    }
+    for(int i = 1; i <= n; i++)
+    {
+        while(true)
+        {
+            int x;
+            scanf("%d", &x);
+            if(x == 0) break;
+            es[i].push_back(x);
+            deg[x]++;
+        }
+    }
+    for(int i = 1; i <= n; i++)
+        if(deg[i] == 0)
+            dfs(i);
+    for(int i = 1; i <= n; i++)
+        printf("%d ", ans[i]);
+    return 0;
+}
+```
+== H. 怀表问题：简单组合计数
+一道比较麻烦的组合计数。
+
+对于题目所说的各种情形，我们简化为：我们要用 `aa`, `ab`, `bb`, `ba` 四种表链组合在一起，使得头尾为 `a, b (have_tail == 0)` 或 `a, a (have_tail == 1)`。先考虑头尾为 `a, b` 的情形，由连接规则可得组合形式是 `aa* ab bb* ba aa* ab ... ba aa* ab bb*`（其中 `*` 表示任意个，可为空，我们这里称为“bubble”，代表需要往里面填 `aa` 或 `bb`）。我们考虑枚举 bubbles 的数目，即可得到 `aa` bubble 和 `bb` bubble 的数目、得到该状态下需要的 `ab` 和 `ba` 的数量并检查是否足够、得到还需要填充多少（`n_need`）个 `aa` 或 `bb`。枚举我们目前有且可以组合出 `n_need` 个表链的 `(aa, bb)` 数目，则剩下的部分就是组合数问题了：将 `a` 个 `aa` 放进 `a_bub` 个桶中，将 `b` 个 `bb` 放进 `b_bub` 个桶中（可以转换为隔板法，将 `a_bub-1` 个隔板插入 `a+1` 个位置），用乘法原理相乘，再将所有答案加起来。
+
+```cpp
+const int maxn = 42;
+const int LL = 0, LV = 1, VV = 2, VL = 3;
+int str_to_type(char x, char y)
+{
+	if(x == 'L' && y == 'L') return LL;
+	if(x == 'L' && y == 'V') return LV;
+	if(x == 'V' && y == 'V') return VV;
+	if(x == 'V' && y == 'L') return VL;
+	return -1;
+}
+
+int n, k;
+ll c[maxn][maxn];
+
+ll calc(ll x, ll y)
+{
+	// 把 x 件物品放进 y 个桶中的放法数目。
+	return c[x + 1][y - 1];
+}
+
+ll calc_bubbles(int aa, int ab, int bb, int ba, int have_tail)
+{
+	ll ans = 0;
+	for(int bub = 2 - have_tail; bub - 1 <= k; bub += 2)
+	{
+		int a_bub = bub / 2 + have_tail;
+		int b_bub = bub / 2;
+		int n_need = k - (bub - 1);
+		int l = max(n_need - bb, 0);
+		int r = min(n_need, aa);
+		if(ab < bub / 2 || ba < bub / 2 - 1 + have_tail || aa + bb < n_need)
+			continue;
+		for(int a = l; a <= r; a++)
+		{
+			int b = n_need - a;
+			ans += calc(a, a_bub) * calc(b, b_bub);
+		}
+	}
+	return ans;
+}
+
+int main()
+{
+	// 预计算组合数
+	{
+		c[0][0] = 1;
+		c[1][0] = 1;
+		c[1][1] = 1;
+		for(int n = 2; n < maxn; n++)
+		{
+			c[n][0] = 1;
+			for(int r = 1; r <= n; r++)
+				c[n][r] = c[n - 1][r - 1] + c[n - 1][r];
+		}
+	}
+	while(true)
+	{
+		scanf("%d %d", &n, &k);
+		if(n == -1) break;
+		char s[3];
+		int num[4], exp_type;
+		num[LL] = num[LV] = num[VV] = num[VL] = 0;
+		scanf("%s", s);
+		exp_type = str_to_type(s[0], s[1]);
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%s", s);
+			num[str_to_type(s[0], s[1])]++;
+		}
+		ll ans = 0;
+		if(exp_type == LL) ans = calc_bubbles(num[LL], num[LV], num[VV], num[VL], 1);
+		if(exp_type == VL) ans = calc_bubbles(num[LL], num[LV], num[VV], num[VL], 0);
+		if(exp_type == VV) ans = calc_bubbles(num[VV], num[VL], num[LL], num[LV], 1);
+		if(exp_type == LV) ans = calc_bubbles(num[VV], num[VL], num[LL], num[LV], 0);
+		if(ans > 0) printf("YES\n%lld\n", ans);
+		else printf("NO\n");
+		n = -1; k = -1;
+	}
+	return 0;
+}
+
+```
+
+= 2024 题解
+
+== A. 字符串中最长的连续出现的字符
+== B. 垃圾炸弹
+== C. 传送法术
+== D. 电影院排座
+== E. 正方形
+== F. Pre-Post-erous!
+== G. Truck History
+== H. Remmarguts' Date
+
+= 2023 题解
+
+== A. 全在其中
+== B. 最接近的分数
+== C. 踩方格
+== D. 核电站
+== E. 合法出栈序列
+== F. 海盗船
+== G. Highways
+== H. Dynamic Declaration Language (DDL)

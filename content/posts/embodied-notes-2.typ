@@ -8,7 +8,7 @@
   tags: (
     category: ("计算机图形学", "具身智能", "Rendering", "Monte Carlo PDE", "论文笔记")
   ),
-  draft: false,
+  draft: true,
   references: ```bib
 @misc{yamashita2026chokaguyahime,
   author       = {山下清悟},
