@@ -1,0 +1,5 @@
+/* Fix Xiaohongshu icon color in dark mode */
+[data-theme="dark"] .social-icons a[title*="Xiaohongshu"] svg path,
+[data-theme="dark"] .social-icons a[href*="xiaohongshu"] svg path {
+  fill: var(--content);
+}

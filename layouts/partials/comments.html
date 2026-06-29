@@ -1,18 +1,36 @@
-<div id="comments">
-  <script src="https://giscus.app/client.js"
-          data-repo="rubatotree/blog"
-          data-repo-id="R_kgDOSaTjVA"
-          data-category="Announcements"
-          data-category-id="DIC_kwDOSaTjVM4C-FGi"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="0"
-          data-input-position="top"
-          data-theme="preferred_color_scheme"
-          data-lang="zh-CN"
-          data-loading="lazy"
-          crossorigin="anonymous"
-          async>
-  </script>
-</div>
+<div id="comments"></div>
+
+<script>
+  const giscusTheme = document.documentElement.dataset.theme === 'dark' ? 'transparent_dark' : 'light';
+  const giscusAttrs = {
+    src: 'https://giscus.app/client.js',
+    'data-repo': 'rubatotree/blog',
+    'data-repo-id': 'R_kgDOSaTjVA',
+    'data-category': 'Announcements',
+    'data-category-id': 'DIC_kwDOSaTjVM4C-FGi',
+    'data-mapping': 'pathname',
+    'data-strict': '0',
+    'data-reactions-enabled': '1',
+    'data-emit-metadata': '0',
+    'data-input-position': 'top',
+    'data-theme': giscusTheme,
+    'data-lang': 'zh-CN',
+    'data-loading': 'lazy',
+    crossorigin: 'anonymous',
+    async: ''
+  };
+
+  const script = document.createElement('script');
+  Object.entries(giscusAttrs).forEach(([k, v]) => script.setAttribute(k, v));
+  document.getElementById('comments').appendChild(script);
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    setTimeout(() => {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'transparent_dark' : 'light';
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (iframe) {
+        iframe.contentWindow.postMessage({giscus: {setConfig: {theme}}}, 'https://giscus.app');
+      }
+    }, 100);
+  });
+</script>
