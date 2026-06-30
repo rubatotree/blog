@@ -762,11 +762,155 @@ int main()
 
 = 2023 题解
 
-== A. 全在其中
-== B. 最接近的分数
-== C. 踩方格
-== D. 核电站
-== E. 合法出栈序列
-== F. 海盗船
-== G. Highways
-== H. Dynamic Declaration Language (DDL)
+这场整体比 2024 年 2025 年都简单，主要是有两道大模拟。
+
+== A. 全在其中：简单字符串
+和 #link("#loc-7","2025B All in All") 完全相同。说明还是会考往年题。
+== B. 最接近的分数：枚举
+```cpp
+int main()
+{
+	int n, a, b;
+	scanf("%d %d %d", &n, &a, &b);
+	int ansi = 0, ansj = 1;
+	for(int i = 1; i <= n; i++)
+		for(int j = 1; j <= n; j++)
+			if(i * b < a * j && ansi * j < i * ansj)
+			{
+				ansi = i; ansj = j;
+			}
+	printf("%d %d\n", ansi, ansj);
+	return 0;
+}
+```
+== C. 踩方格：搜索
+```cpp
+const int maxn = 100 + 10;
+int n, vis[maxn][maxn];
+ll dfs(int x, int y, int d)
+{
+	if(vis[x][y]) return 0;
+	if(d == n) return 1;
+	vis[x][y] = 1;
+	ll ans = dfs(x - 1, y, d + 1) + dfs(x + 1, y, d + 1) + dfs(x, y - 1, d + 1);
+	vis[x][y] = 0;
+	return ans;
+}
+int main()
+{
+	scanf("%d", &n);
+	printf("%lld\n", dfs(50, 50, 0));
+	return 0;
+}
+```
+== D. 核电站：动态规划
+设 $f_(i, j)$ 表示在前 $i$ 个位置上，最后有 $j$ 个连续的核弹时的方案数。则可设置初值 $f_(0, 0)=1$ 代表没有位置、什么都不放算一种方案。可以在尾部添加一个虚拟空位使得 $f_(n+1, 0)$ 表示所求答案。状态转移为，下一个空位不放核弹，则方案数为此前所有可行状态的方案数之和；否则如果放核弹，方案数为此前状态中最后有 $j-1$ 个连续核弹的方案数。
+
+注意到这题还可以用滚动数组优化。进一步地，可以写成一个 $m times m$ 矩阵，然后手算特征值或者矩阵快速幂解决。但这题数据范围给得很小所以直接 DP 就够了。
+
+$
+"ans"=mat(1,1,1,1,...,1)mat(1,1,1,1,...,1;1,0,,,...,;,1,0,,...,;,,1,0,...,;,,,,...,;,,,,1,0)^n vec(1,0,0,0,...,0)
+$
+
+其实感觉这个数据范围剪枝爆搜也能做出来。
+```cpp
+const int maxn = 50 + 10;
+
+int n, m;
+ll f[maxn][maxn];
+
+int main()
+{
+	scanf("%d%d", &n, &m);
+	f[0][0] = 1;
+	for(int i = 1; i <= n + 1; i++)
+	{
+		f[i][0] = f[i - 1][0];
+		for(int j = 1; j <= m - 1; j++)
+		{
+			f[i][0] += f[i - 1][j];
+			f[i][j] = f[i - 1][j - 1];
+		}
+	}
+	printf("%lld\n", f[n + 1][0]);
+	return 0;
+}
+```
+== E. 合法出栈序列：模拟
+同时维护一个栈和一个出栈队列，可以理解为不断按给定顺序入栈，不断检查当前栈头是不是该出栈了，如果可以出栈，就弹出栈头并让出栈序列移到下一个。模拟即可。
+```cpp
+const int maxn = 100 + 10;
+char x[maxn], s[maxn], stk[maxn];
+int main()
+{
+	scanf("%s\n", x);
+	int n = strlen(x);
+	while(true)
+	{
+		scanf("%s\n", s);
+		if(s[0] == '\0') break;
+		int p = 0, q = 0;
+		for(int i = 0; i < n; i++)
+		{
+			stk[p++] = x[i];
+			while(q < n && p > 0 && s[q] == stk[p - 1])
+			{
+				p--; q++;
+			}
+		}
+		printf((p == 0 && q == n) ? "YES\n" : "NO\n");
+		s[0] = '\0';
+	}
+	return 0;
+}
+```
+== F. 海盗船：搜索，模拟
+大模拟，暂时不是很想做，考场遇到肯定放后面。由于深搜可能会陷入一直转来转去的坏情况，这里需要用广搜或者迭代加深搜索做。
+== G. Highways：最小生成树
+由 Highway 的定义我们需要求出图的最大边最小的生成树，由 Kruskal 算法的过程可知 Kruskal 可以自然求出这棵生成树。
+```cpp
+const int maxn = 2000 + 10, maxm = 2000 + 10, inf = 1 << 30;
+int n, m, fa[maxn];
+int Find(int o) { return o == fa[o] ? o : fa[o] = Find(fa[o]); }
+void Union(int u, int v) { fa[Find(u)] = Find(v); }
+struct edge
+{
+    int u, v, w;
+    bool operator<(const edge& b) const { return w > b.w; }
+};
+int main()
+{
+    int t;
+    scanf("%d", &t);
+    for(int T = 1; T <= t; T++)
+    {
+        scanf("%d", &n);
+        priority_queue<edge> pq;
+        for(int u = 1; u <= n; u++) fa[u] = u;
+        for(int u = 1; u <= n; u++)
+            for(int v = 1; v <= n; v++)
+            {
+                int w;
+                scanf("%d", &w);
+                if(v > u)
+                    pq.push({u, v, w});
+            }
+        int ans = 0;
+        while(!pq.empty())
+        {
+            edge e = pq.top(); pq.pop();
+            if(Find(e.u) != Find(e.v))
+            {
+                ans = e.w;
+                Union(e.u, e.v);
+            }
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+
+```
+== H. Dynamic Declaration Language (DDL)：模拟；计算机系统
+
+又一道大模拟。汇编语言模拟器。暂时不想做。
