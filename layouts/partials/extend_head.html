@@ -40,3 +40,15 @@
 {{- with .Description -}}
 <meta property="og:description" content="{{ . | plainify | htmlUnescape | trim }}">
 {{- end -}}
+
+{{- /* Code block background color overrides */ -}}
+{{- $codeBg := site.Params.codeBlock.bg | default "rgb(28, 29, 33)" -}}
+{{- $codeBgDark := site.Params.codeBlock.bgDark | default "rgb(46, 46, 51)" -}}
+<style>
+    :root {
+        --code-block-bg: {{ $codeBg | safeCSS }};
+    }
+    :root[data-theme="dark"] {
+        --code-block-bg: {{ $codeBgDark | safeCSS }};
+    }
+</style>

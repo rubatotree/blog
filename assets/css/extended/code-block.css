@@ -1,0 +1,104 @@
+/* Code block enhancements: padding, parallax hover, edge glow, copy button.
+   Overrides PaperMod defaults — loaded as an extended asset. */
+
+/* ---------- 1. Base styling ---------- */
+.post-content pre code {
+    font-size: 0.8em;
+    padding: 18px 24px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ---------- 2. Container — edge glow on hover ---------- */
+.post-content pre,
+.post-content div.highlight {
+    border-radius: var(--radius);
+    outline: 1px solid transparent;
+    transition:
+        transform  0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
+        outline   0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.post-content pre:hover,
+.post-content div.highlight:hover {
+    transform: translateY(-3px);
+    outline: 1px solid rgba(120, 130, 160, 0.45);
+    box-shadow: 0 8px 12 rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="dark"] .post-content pre:hover,
+html[data-theme="dark"] .post-content div.highlight:hover {
+    outline-color: rgba(140, 150, 200, 0.45);
+    box-shadow: 0 8px 12px rgba(80, 90, 140, 0.18),
+                0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .post-content pre:hover,
+    html:not([data-theme="light"]) .post-content div.highlight:hover {
+        outline-color: rgba(140, 150, 200, 0.45);
+        box-shadow: 0 8px 28px rgba(80, 90, 140, 0.18),
+                    0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ---------- 4. Copy button ---------- */
+.copy-code {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    top: 10px;
+    right: 10px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--secondary);
+    background: var(--theme);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.22s ease,
+        visibility 0.22s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    white-space: nowrap;
+}
+
+div.highlight:hover .copy-code,
+pre:hover .copy-code {
+    opacity: 1;
+    visibility: visible;
+}
+
+.copy-code:hover {
+    color: var(--primary);
+    background: var(--code-bg);
+    border-color: var(--secondary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+}
+
+.copy-code::before {
+    content: '';
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+}
+
+.copy-code.copied::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+}

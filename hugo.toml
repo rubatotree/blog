@@ -18,6 +18,12 @@ comments = true
 
 images = ["images/og-default.png"]
 
+[params.codeBlock]
+# Code block background color (light theme)
+bg = "rgb(38, 41, 51)"
+# Code block background color (dark theme)
+bgDark = "rgb(36, 36, 39)"
+
 [params.assets]
 favicon = "favicon.ico"
 favicon16x16 = "favicon.ico"
