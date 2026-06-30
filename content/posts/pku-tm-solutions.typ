@@ -458,14 +458,307 @@ int main()
 
 = 2024 题解
 
-== A. 字符串中最长的连续出现的字符
-== B. 垃圾炸弹
-== C. 传送法术
-== D. 电影院排座
-== E. 正方形
-== F. Pre-Post-erous!
-== G. Truck History
-== H. Remmarguts' Date
+这场难度是按顺序排序的（除了实际上 G 可能比 F 简单一点）。除最后一题外整体比 2025 年简单一些，我认为前 7 题难度不超过 CF Div3。
+
+== A. 字符串中最长的连续出现的字符：简单字符串
+```cpp
+const int maxn = 200 + 10;
+
+char s[maxn];
+int main()
+{
+	scanf("%s", s);
+	int n = strlen(s), ans = 0, cur = 1;
+	char anschar;
+	for(int i = 1; i <= n; i++)
+	{
+		if(s[i] == s[i - 1]) cur++;
+		else
+		{
+			if(cur > ans)
+			{
+				anschar = s[i - 1];
+				ans = cur;
+			}
+			cur = 1;
+		}
+	}
+	printf("%c %d\n", anschar, ans);
+	return 0;
+}
+```
+== B. 垃圾炸弹：模拟
+因为炸弹至少要炸掉一个垃圾，我们考虑只暴力检查垃圾周围的位置，时间复杂度就足以通过了。
+
+这题的坑非常多，交的时候挂了几次，务必多检查。
+```cpp
+const int maxn = 20 + 10, maxx = 1025;
+
+int d, n, xx[maxn], yy[maxn], ii[maxn];
+bool vis[maxx][maxx];
+
+int check(int x, int y)
+{
+	int res = 0;
+	for(int i = 1; i <= n; i++)
+		if(abs(xx[i] - x) <= d && abs(yy[i] - y) <= d)
+			res += ii[i];
+	return res;
+}
+
+int main()
+{
+	scanf("%d%d", &d, &n);
+	for(int i = 1; i <= n; i++)
+		scanf("%d%d%d", &xx[i], &yy[i], &ii[i]);
+	int ans = 0, ansn = 1;
+	for(int i = 1; i <= n; i++)
+		for(int y = yy[i] - d; y <= yy[i] + d; y++)
+			for(int x = xx[i] - d; x <= xx[i] + d; x++)
+			{
+				if(x < 0 || x >= maxx || y < 0 || y >= maxx) continue;
+				int cur = check(x, y);
+				if(cur > ans)
+				{
+					ansn = 1;
+					ans = cur;
+					vis[x][y] = true;
+				}
+				else if(cur == ans && !vis[x][y])
+				{
+					ansn++;
+					vis[x][y] = true;
+				}
+			}
+	printf("%d %d\n", ansn, ans);
+	return 0;
+}
+
+```
+== C. 传送法术：搜索；问题转化
+可以消耗一个代价传送到镜像位置，那么就等价于给地图复制反转并粘到下一行形成一个 2\*n 的迷宫。剩下的就是搜索了。
+```cpp
+const int maxn = 1000 + 10, inf = 1 << 30;
+
+struct tr { int x, y, d; };
+int n, sx, ans = -1;
+char maze[2][maxn];
+queue<tr> q;
+
+int main()
+{
+    scanf("%d\n%s", &n, maze[0]);
+    for(int x = 0; x < n; x++)
+    {
+        maze[1][n - x - 1] = maze[0][x];
+        if(maze[0][x] == 'S') sx = x;
+    }
+    q.push({sx, 0, 0});
+    while(!q.empty())
+    {
+        tr t = q.front(); q.pop();
+        if(maze[t.y][t.x] == '#') continue;
+        if(maze[t.y][t.x] == 'T') 
+        {
+            ans = t.d;
+            break;
+        }
+        if(maze[t.y][t.x] == 'V') continue;
+        maze[t.y][t.x] = 'V';
+        if(t.x >= 1) q.push({t.x - 1, t.y, t.d + 1});
+        if(t.x < n - 1) q.push({t.x + 1, t.y, t.d + 1});
+        if(t.y == 0) q.push({t.x, 1, t.d + 1});
+        if(t.y == 1) q.push({t.x, 0, t.d + 1});
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+== D. 电影院排座：动态规划
+比较经典的 DP 题。记 $f_(j, i, k)$ 为目前分配到前 $j$ 个座位、共分配了 $i$ 人、在当前座位有人（$k=1$）或无人（$k=0$）时，能取得的最大舒适度。不合法的状态舒适度设置为 $-infinity$。则最终答案应为 $max{f_(n,m,0),f_(n,m,1)}$.
+
+对于状态转移，若要在当前位置分配人，则前一个位置必须没有人；如果不分配，则前一个位置有没有人都没关系，因此可以列出状态转移方程：
+$
+f_(j,i,0)&=max{f_(j-1,i,0),f_(j-1,i,1)},quad
+f_(j,i,1)&=f_(j-1,i-1,0)+a_j
+$
+直接 DP 即可。注意到这个方程还可以用滚动数组优化，但这题没卡空间就懒了。
+```cpp
+const int maxn = 4000 + 10, maxm = 2000 + 10, inf = 1 << 30;
+
+int n, m, a[maxn], dp[maxn][maxm][2];
+
+int main()
+{
+    scanf("%d%d", &n, &m);
+    for(int i = 1; i <= n; i++) scanf("%d", &a[i]);
+		dp[0][0][1] = -inf;
+    for(int i = 1; i <= m; i++)
+    {
+        dp[0][i][0] = -inf;
+        dp[0][i][1] = -inf;
+    }
+    for(int j = 1; j <= n; j++)
+        for(int i = 1; i <= m; i++)
+        {
+            dp[j][i][0] = max(dp[j - 1][i][0], dp[j - 1][i][1]);
+            dp[j][i][1] = dp[j - 1][i - 1][0] + a[j];
+        }
+    printf("%d\n", max(dp[n][m][0], dp[n][m][1]));
+    return 0;
+}
+```
+== E. 正方形：计算几何
+考虑枚举对角线，并用向量计算的方法找到另外两点的坐标并检查是否都存在顶点，即能找到正方形。因为正方形有两条对角线所以会重复统计两次，答案除以 2 即可。需要注意的是对负数向量取模的操作会有坑。
+```cpp
+const int maxn = 1000 + 10;
+
+int n, x[maxn], y[maxn];
+map<pair<int, int>, bool> mp;
+
+int main()
+{
+	while(true)
+	{
+		scanf("%d", &n);
+		if(n == 0) break;
+		mp.clear();
+		for(int i = 1; i <= n; i++) 
+		{
+			scanf("%d%d", &x[i], &y[i]);
+			mp[{x[i], y[i]}] = true;
+		}
+		int ans = 0;
+		for(int i = 1; i <= n - 1; i++)
+			for(int j = i + 1; j <= n; j++)
+			{
+				int vx = x[j] - x[i], vy = y[j] - y[i];	// 向量
+				int rvx = -vy, rvy = vx;	// 逆时针旋转 90°
+				if((vx + rvx + 40000) % 2 == 1 || (vy + rvy + 40000) % 2 == 1) continue;	// 中点不在格点上
+				int tvx = (vx + rvx) / 2, tvy = (vy + rvy) / 2;	// 取中值就是正方形边向量
+				if(mp[{x[i] + tvx, y[i] + tvy}] && mp[{x[j] - tvx, y[j] - tvy}])
+					ans++;
+			}
+		printf("%d\n", ans / 2);
+	}
+	return 0;
+}
+
+```
+== F. Pre-Post-erous!：树
+这题的题目表述有一个陷阱：已知先序遍历序和后序遍历序，其实是可以完全确定树的结构的。知道这个结论后就很简单了，我们需要做的是找到有多少种填充空位的方式，实际上就是计算每个节点关于容量和子节点数的组合数，然后乘法原理乘起来即可。
+
+我做这题的时候忘记怎样从先序遍历序和后序遍历序确定树结构了，现场推了一下。先序遍历序中一个节点到下一个节点的关系可能是子节点，也有可能子节点已经遍历完，是某个父亲的下一个子节点。观察到后序遍历中父子关系一定呈现逆序，因此不断检查这一点向上递归地找到一个合适的父节点添加子节点即可。
+```cpp
+const int maxn = 26 + 3;
+
+int n, m;
+char s1[maxn], s2[maxn];
+int num2[maxn], fa[maxn], odeg[maxn], c[maxn][maxn];
+
+int main()
+{
+  {
+    // 预计算组合数
+		c[0][0] = 1;
+		c[1][0] = 1;
+		c[1][1] = 1;
+		for(int n = 2; n < maxn; n++)
+		{
+			c[n][0] = 1;
+			for(int r = 1; r <= n; r++)
+				c[n][r] = c[n - 1][r - 1] + c[n - 1][r];
+		}
+	}
+    while(true)
+    {
+        scanf("%d ", &m);
+        if(m == 0) break;
+        for(int i = 0; i < 26; i++)
+        {
+            odeg[i] = 0;
+            num2[i] = 0;
+            fa[i] = -1;
+        }
+        scanf("%s %s\n", s1, s2);
+        n = strlen(s1);
+        for(int i = 0; i < n; i++)
+            num2[s2[i] - 'a'] = i;
+        for(int i = 1; i < n; i++)
+        {
+            int u = s1[i - 1] - 'a';
+            int v = s1[i] - 'a';
+            int o = u;
+            while(num2[o] < num2[v]) o = fa[o];
+            fa[v] = o;
+            odeg[o]++;
+        }
+        ll ans = 1;
+        for(int i = 0; i < 26; i++)
+            if(odeg[i] > 0)
+                ans *= c[m][odeg[i]];
+        printf("%lld\n", ans);
+    }
+    return 0;
+}
+```
+== G. Truck History：最小生成树
+题目看上去比较唬人，找一棵代价最小的“继承树”，实际上考虑到继承关系边无论怎么指向都是一样的权重，本题就可以转化为在完全图上找一棵最小生成树了。
+```cpp
+const int maxn = 2000 + 10, maxm = 2000 + 10, inf = 1 << 30;
+
+int n, m;
+char s[maxn][maxm];
+int fa[maxn];
+
+int Find(int o) { return o == fa[o] ? o : fa[o] = Find(fa[o]); }
+void Union(int u, int v) { fa[Find(u)] = Find(v); }
+
+struct edge
+{
+    int u, v, w;
+    bool operator<(const edge& b) const { return w > b.w; }
+};
+
+int main()
+{
+    while(true)
+    {
+        scanf("%d\n", &n);
+        if(n == 0) break;
+        for(int i = 1; i <= n; i++) scanf("%s\n", s[i]);
+        m = strlen(s[1]);
+        for(int i = 1; i <= n; i++) fa[i] = i;
+        priority_queue<edge> pq;
+        for(int i = 1; i < n; i++)
+            for(int j = i + 1; j <= n; j++)
+            {
+                int w = 0;
+                for(int k = 0; k < m; k++)
+                    if(s[i][k] != s[j][k])
+                        w++;
+                pq.push({i, j, w});
+            }
+        int ans = 0;
+        while(!pq.empty())
+        {
+            edge e = pq.top(); pq.pop();
+            if(Find(e.u) != Find(e.v))
+            {
+                ans += e.w;
+                Union(e.u, e.v);
+            }
+        }
+        printf("The highest possible quality is 1/%d.\n", ans);
+    }
+    return 0;
+}
+```
+== H. Remmarguts' Date：k 短路
+
+防 AK 题。有向图 k 短路模板题，然而我还不会 k 短路，所以不写了。参考：
+- #link("https://oi-wiki.org/graph/kth-path/", "k 短路 - OI Wiki")
+- #link("https://www.luogu.com.cn/problem/P2483", "P2483 【模板】k 短路 / [SDOI2010] 魔法猪学院 - 洛谷")
 
 = 2023 题解
 
