@@ -18,13 +18,16 @@
   margin-inline-start: 0 !important;
 }
 
-/* Inline code highlight: replace Typst default (Monokai) tokens with Catppuccin Macchiato.
-   Typst outputs raw <span style="color: #..."> elements — we override them via attribute selectors. */
+/* Inline code highlight: replace Typst default (Monokai) tokens AND their
+   invert(1) + hue-rotate(180deg) filtered equivalents with Catppuccin Macchiato.
+   Typst outputs raw <span style="color: #..."> elements — we override via attribute selectors. */
+
+/* Direct Monokai -> Catppuccin */
 .post-content .typst-raw-block pre > code[data-lang] span[style*="color: #f92672"] {
   color: #c6a0f6 !important; /* Monokai pink → Catppuccin Mauve (keywords) */
 }
 .post-content .typst-raw-block pre > code[data-lang] span[style*="color: #d73948"] {
-  color: #ed8796 !important; /* Monokai red → Catppuccin Red (keyword declarations / operators) */
+  color: #ed8796 !important; /* Monokai red → Catppuccin Red (declarations / operators) */
 }
 .post-content .typst-raw-block pre > code[data-lang] span[style*="color: #ae81ff"] {
   color: #8aadf4 !important; /* Monokai purple → Catppuccin Blue (builtins / functions) */
@@ -49,4 +52,36 @@
 }
 .post-content .typst-raw-block pre > code[data-lang] span[style*="color: #74747c"] {
   color: #8087a2 !important; /* Monokai gray → Catppuccin Overlay1 (annotations) */
+}
+
+/* Filtered Monokai (invert(1) + hue-rotate(180deg)) -> Catppuccin */
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #ff74c0"] {
+  color: #c6a0f6 !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #ff8190"] {
+  color: #ed8796 !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #8659d7"] {
+  color: #8aadf4 !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #7795f2"] {
+  color: #8aadf4 !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #00546a"] {
+  color: #eed49f !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #49b840"] {
+  color: #a6da95 !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #ffa5fb"] {
+  color: #f5a97f !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #64b3bd"] {
+  color: #8bd5ca !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #938f7c"] {
+  color: #6e738d !important;
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #8a8a92"] {
+  color: #8087a2 !important;
 }
