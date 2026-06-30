@@ -18,7 +18,35 @@
   margin-inline-start: 0 !important;
 }
 
-/* Invert Typst inline highlight token colors while keeping the block background unchanged. */
-.post-content .typst-raw-block pre > code[data-lang] span[style*="color:"] {
-  filter: invert(1) hue-rotate(180deg);
+/* Inline code highlight: replace Typst default (Monokai) tokens with Catppuccin Macchiato.
+   Typst outputs raw <span style="color: #..."> elements — we override them via attribute selectors. */
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #f92672"] {
+  color: #c6a0f6 !important; /* Monokai pink → Catppuccin Mauve (keywords) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #d73948"] {
+  color: #ed8796 !important; /* Monokai red → Catppuccin Red (keyword declarations / operators) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #ae81ff"] {
+  color: #8aadf4 !important; /* Monokai purple → Catppuccin Blue (builtins / functions) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #4b69c6"] {
+  color: #8aadf4 !important; /* Monokai blue → Catppuccin Blue (function names) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #66d9ef"] {
+  color: #eed49f !important; /* Monokai cyan → Catppuccin Yellow (class / type names) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #198810"] {
+  color: #a6da95 !important; /* Monokai green → Catppuccin Green (strings) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #b60157"] {
+  color: #f5a97f !important; /* Monokai dark magenta → Catppuccin Peach (numbers) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #1d6c76"] {
+  color: #8bd5ca !important; /* Monokai dark teal → Catppuccin Teal (escape sequences) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #75715e"] {
+  color: #6e738d !important; /* Monokai brown → Catppuccin Overlay0 (comments) */
+}
+.post-content .typst-raw-block pre > code[data-lang] span[style*="color: #74747c"] {
+  color: #8087a2 !important; /* Monokai gray → Catppuccin Overlay1 (annotations) */
 }

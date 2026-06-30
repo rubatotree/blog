@@ -19,10 +19,10 @@ comments = true
 images = ["images/og-default.png"]
 
 [params.codeBlock]
-# Code block background color (light theme)
-bg = "rgb(38, 41, 51)"
-# Code block background color (dark theme)
-bgDark = "rgb(36, 36, 39)"
+# Code block background — Catppuccin Macchiato base
+bg = "rgb(48, 51, 71)"
+# Code block background (dark) — Catppuccin Macchiato crust
+bgDark = "rgb(23, 23, 29)"
 
 [params.assets]
 favicon = "favicon.ico"
