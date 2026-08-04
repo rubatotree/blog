@@ -10,6 +10,14 @@
   ),
   draft: false,
   references: ```bib
+@misc{yamashita2026chokaguyahime,
+  author       = {山下清悟},
+  title        = {超かぐや姫！},
+  howpublished = {Netflix},
+  year         = {2026},
+  note         = {アニメーション映画。監督：山下清悟。制作：STUDIO COLORIDO、STUDIO CHROMATO、ツインエンジン。2026年1月22日配信},
+  url          = {https://www.netflix.com/title/81756595}
+},
 @article{robosplat,
   title={Novel Demonstration Generation with Gaussian Splatting Enables Robust One-Shot Manipulation},
   author={Yang, Sizhe and Yu, Wenye and Zeng, Jia and Lv, Jun and Ren, Kerui and Lu, Cewu and Lin, Dahua and Pang, Jiangmiao},
@@ -39,6 +47,10 @@
 }
   ```,
 )
+#figure(
+  caption: "玩音乐的最终归宿是转行具身智能。" + cite(<yamashita2026chokaguyahime>),
+  image("/images/embodied-notes-1-robosplat/teaser.png"),
+) <fig-robosplat-teaser>
 这周组会上导师提到现在做 Rendering 已经很难有价值和影响力了，也很难找到好的课题，应该 all in 具身智能。感觉自己从一个转型阵痛期的组跳进了另一个转型阵痛期的组。不过转型是正确的，具身方向的确好发有影响力的论文，就业前景也比传统图形学好。虽然私心比较喜欢简洁优雅但没用的图形学，但确实应该现实一点。我们该思考一下怎样把已有的图形学、渲染经验搬到具身智能的应用上。
 
 组里同学分享的 RoboSplat @robosplat 一文确实相当契合 CG for embodied 的愿景，因此我们从这篇论文开始了解我们能够做什么。

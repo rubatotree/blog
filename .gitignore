@@ -5,3 +5,5 @@ resources/_gen/
 
 # VS Code settings
 .vscode/
+
+__pycache__
