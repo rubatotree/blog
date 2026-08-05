@@ -2,11 +2,11 @@
 #import "@hugo/utils:0.1.0": *
 
 #show: article.with(
-  title: "ICRA 与 IROS 2025 数据扩展论文速览",
+  title: "ICRA、IROS 2025 与 ICRA 2026 数据扩展论文速览",
   date: datetime(year: 2026, month: 8, day: 4),
   weight: 0,
   tags: (
-    category: ("具身智能", "ICRA", "IROS", "数据扩展", "论文速览")
+    category: ("具身智能", "ICRA", "IROS", "ICRA 2026", "数据扩展", "论文速览")
   ),
   draft: false,
   references: ```bib
@@ -14,9 +14,9 @@
   ```,
 )
 
-本文联合整理 ICRA 与 IROS 2025 的数据扩展工作。ICRA Proceedings 收录 1,604 篇论文并补全 1,602 篇摘要，自动召回 279 篇候选后人工保留 32 篇；IROS Proceedings 收录 1,985 篇论文并补全 1,983 篇摘要，从 309 篇候选中人工保留 31 篇。两届合计审计 3,589 篇论文，在同一主题框架下比较机器人数据如何被采集、转换、合成、筛选和复用。
+本文联合整理 ICRA 2025、IROS 2025 与 ICRA 2026 的数据扩展工作。ICRA 2025 Proceedings 收录 1,604 篇论文并补全 1,602 篇摘要，自动召回 279 篇候选后人工保留 32 篇；IROS 2025 Proceedings 收录 1,985 篇论文并补全 1,983 篇摘要，从 309 篇候选中人工保留 31 篇。ICRA 2026 则依据官方 PaperCept 程序的 *ICRA 2026 peer-reviewed conference presentations*：2,951 条程序行中排除 131 条非同行评议、非出版物的 Late Breaking Results，保留 2,820 条展示（2,604 个 interactive、216 个 oral）；其中 2,639 条提供官方关键词与摘要。该届自动高召回 110 篇，人工审计后保留 25 篇。三部分合计审计 6,409 条正式论文或同行评议展示，在同一主题框架下比较机器人数据如何被采集、转换、合成、筛选和复用。
 
-这里的“数据扩展”不只指增加轨迹数量，也包括降低采集成本、吸收人类视频、跨本体共享监督、生成物理可执行数据、复用失败示教，以及让触觉和声音等稀缺模态进入通用 Policy。每篇整理基于公开摘要，实验数字均指作者报告的结果。
+这里的“数据扩展”不只指增加轨迹数量，也包括降低采集成本、吸收人类视频、跨本体共享监督、生成物理可执行数据、复用失败示教，以及让触觉和声音等稀缺模态进入通用 Policy。每篇整理基于公开摘要，实验数字均指作者报告的结果。ICRA 2026 的中文小结只改写 PaperCept 官方关键词和摘要，不推断 DOI、PDF 或 IEEE Xplore 可用性。
 
 其中三篇 ICRA 入选工作获得分领域最佳论文奖：Robo-DM 获 Robot Learning，Human-Agent Joint Learning 获 Human-Robot Interaction，PolyTouch 获 Field and Service Robotics。IROS 部分不按奖项筛选，而是优先补充低成本采集、跨本体生成、Real-to-Sim 和数据配方方面与 ICRA 可对照的工作。
 
@@ -89,6 +89,28 @@ HACTS 在机器人关节与低成本遥操作硬件之间建立双向实时同�
 
 Exo-ViHa 以模块化 3D 打印外骨骼、SLAM 相机、动作捕捉手套和腕部相机同步采集末端位姿、手部运动与第一视角视觉，并让用户直接感受接触反馈。不同机械臂和灵巧手可接入同一系统，实验显示采集成功率与效率均得到改善。跨平台能力仍依赖末端模块、相机和手套的联合标定，直接交互也不能消除人机运动学差异。
 
+== ICRA 2026
+
+=== MOVE: A Simple Motion-Based Data Collection Paradigm for Spatial Generalization in Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab3015", "官方摘要")]
+
+MOVE 在每条动态示教中引入可移动物体的运动，使一段轨迹隐式覆盖更多物体、目标和相机的空间配置，而不是重复固定布局。作者在仿真和真实操作中验证；其空间泛化仿真任务的平均成功率为 39.1%，相对静态采集的 22.2% 提高 76.1%，部分任务的数据效率提高 2--5 倍。该收益针对空间变化，不能替代接触、材质等未覆盖因素的示教。
+
+=== COBALT: Crowdsourcing Robot Learning Via Cloud-Based Teleoperation with Smartphones [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab3809", "官方摘要")]
+
+COBALT 将手机、VR 和 3D 鼠标接入云端向量化遥操作，并以同步视频流、内存数据缓存、实时指标和训练课程控制采集质量。官方摘要报告该系统在 8 张 GPU 上同时服务 256 名客户端，并在五天、九个国家的手机采集中得到 7,500 多条示教、超过 50 小时的试点数据；作者再以该数据训练模仿学习算法。它把众包规模与轨迹筛选绑定，实际质量仍取决于操作者和任务分布。
+
+=== FreeTacMan: Robot-Free Visuo-Tactile Data Collection System for Contact-Rich Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2650", "官方摘要")]
+
+FreeTacMan 以可穿戴夹爪和光学跟踪替代实体机器人采集，同步记录末端位姿、视觉与触觉。作者发布的数据包含超过 300 万组视觉--触觉图像和位姿、1 万条轨迹、50 个接触丰富任务，并报告由自采数据可训练有效 Policy。该接口直接补齐人类示教中的接触观测，但向目标末端执行器迁移仍依赖几何与传感器对应关系。
+
+=== Humanoid Everyday: A Comprehensive Robotic Dataset for Open-World Humanoid Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab5055", "官方摘要")]
+
+Humanoid Everyday 通过人类监督遥操作收集人形机器人全身操作、人与机器人交互和带行走动作的数据，并同步提供 RGB、深度、LiDAR、触觉与语言标注。其摘要列出 260 个任务的 10.3k 条轨迹、超过 300 万帧，并附带 Policy 学习分析和云端评测平台。它把数据集、采集代码和评测接口一起开放，覆盖范围仍由所列任务和受控评测场景限定。
+
+=== TWIST2: Scalable, Portable, and Holistic Humanoid Data Collection System [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab235", "官方摘要")]
+
+TWIST2 用无动捕的 VR 全身运动和低成本机器人颈部相机进行第一视角人到人形机器人的遥操作，目标是同时保留全身控制与便携性。作者报告 15 分钟可收集 100 条示教且成功率接近 100%，并以采集数据训练分层视觉运动 Policy，展示全身灵巧操作和动态踢球。性能仍受人机运动映射和所用人形平台能力限制。
+
 = 2. 人类视频与跨本体监督
 
 人类视频数量丰富，却缺少机器人动作标签。这里的关键不是直接复制人体关节，而是寻找可跨本体复用的中间监督，例如物体运动、图像轨迹、交互程序和物体中心奖励。
@@ -140,6 +162,24 @@ GeoRT 以几何目标函数学习人手关键点到机器人手关键点的无�
 === Robust and Expressive Humanoid Motion Retargeting via Optimization-Based Rig Unification [#link("https://doi.org/10.1109/IROS60139.2025.11246607", "DOI")]
 
 该方法先把不同骨架和含噪姿态估计统一到规范 Rig，再修复不可行姿势、施加足部接触约束，并针对目标机器人物理限制优化运动，使异构人体动作数据可被多种人形机器人复用。实验覆盖 12 个仿真人形机器人和 3 个真实平台，能够稳定生成富有表现力的上肢动作。重定向结果仍受源动作质量、接触假设和目标机器人的动力学能力限制。
+
+== ICRA 2026
+
+=== Scaling Single Human Demonstrations for Imitation Learning Using Generative Foundational Models [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab1478", "官方摘要")]
+
+Real2Gen 从一段人类示教提取任务信息并转入仿真，由可编程专家反复演示以产生 Policy 训练数据。作者在三项真实任务中报告，生成数据使成功率平均提高 26.6%，且纯仿真训练的 Policy 可零样本部署到真实环境。它以人类演示指定任务、以仿真扩展数量，效果依赖从演示到仿真的信息转移是否正确。
+
+=== Dexterity from Smart Lenses: Multi-Fingered Robot Manipulation with In-The-Wild Human Demonstrations [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab1276", "官方摘要")]
+
+Aina 以 Aria Gen 2 眼镜获取第一视角 RGB、头手三维位姿和双目深度线索，从自然环境的人手活动训练多指手的点云 Policy。作者在五项日常操作中比较已有的人到机器人学习方法，并称部署不需要额外机器人数据、在线修正、强化学习或仿真。该路线将采集端转到可穿戴设备，跨本体有效性仍取决于手部姿态与环境几何的恢复质量。
+
+=== EMMA: Scaling Mobile Manipulation Via Egocentric Human Data [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab6343", "官方摘要")]
+
+EMMA 将人类全身移动操作数据与静态机器人数据共同训练，绕开昂贵的移动机器人遥操作。三项真实任务中，作者报告其完整任务表现可与使用 Mobile ALOHA 遥操作数据的基线相当或更高；增加人类数据小时数时表现呈正向扩展，并能适应新的空间配置和场景。它说明移动底盘数据可由人类第一视角补充，但仍需要静态机器人数据作为动作接口。
+
+=== Masquerade: Learning from In-The-Wild Human Videos Using Data-Editing [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab3734", "官方摘要")]
+
+Masquerade 先估计人手三维姿态、抹除人臂，再把跟随恢复末端轨迹的双臂机器人渲染回第一视角视频，得到视觉上更接近机器人观测的示教。作者以 67.5 万帧编辑视频预训练视觉编码器，并在每项任务仅用 50 条机器人示教微调；三个长时序厨房任务的未见场景评测中，报告比基线高 5--6 倍。编辑与共训练共同承担缩小视觉本体差异的作用，前提是姿态恢复与渲染对齐可靠。
 
 = 3. 示教生成与增强
 
@@ -205,6 +245,24 @@ ReBot 在仿真中回放真实机器人轨迹并替换被操作物体，再把�
 
 DPR 用随机轨迹反转生成初始高质量数据，再由 Transformer 自举合成更多重排轨迹，并把物理奖励反馈注入序列决策，抑制不可执行预测。球体和房间重排任务中，该框架在效率和效果上优于现有方法。自举过程会继承初始数据与模型偏差，物理反馈的有效性也取决于状态表示和可计算的可行性指标。
 
+== ICRA 2026
+
+=== FAR-Dex: Few-Shot Data Augmentation and Adaptive Residual Policy Refinement for Dexterous Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab1208", "官方摘要")]
+
+FAR-DexGen 从少量示教出发，在 IsaacLab 中生成多样且受物理约束的臂--手轨迹；FAR-DexRes 再以观测和多步轨迹片段自适应修正 Policy。作者在仿真和真实任务中报告，数据质量提高 13.4%、成功率比对比方法提高 7%，真实任务成功率超过 80%。生成阶段扩大了可训练轨迹分布，残差修正仍需与目标场景的观测相匹配。
+
+=== UltraDexGrasp: Learning Universal Dexterous Grasping for Bimanual Robots with Synthetic Data [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2931", "官方摘要")]
+
+UltraDexGrasp 将优化抓取合成与规划式示教生成结合，构建含 1,000 个物体、2,000 万帧的双臂多策略抓取数据集。基于合成数据训练的点云抓取 Policy 在作者的真实实验中，对新物体达到平均 81.2% 成功率并实现零样本 Sim-to-Real。该例表明抓取的合成扩展必须同时约束几何贴合与外力可承受性。
+
+=== SoftMimicGen: A Data Generation System for Scalable Robot Learning in Deformable Object Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab5257", "官方摘要")]
+
+SoftMimicGen 面向刚体合成数据难覆盖的可形变操作，提供包含毛绒物、绳、组织和毛巾的高保真仿真环境，并自动生成穿线、甩动、折叠、抓取放置等数据。它覆盖单臂、双臂、人形和手术机器人四种本体，作者以生成数据训练 Policy 并系统分析该管线。其价值在于将形变任务纳入可扩展生成，迁移上限仍由仿真中的材料和接触近似决定。
+
+=== Physically-Grounded Data Generation Via Video Diffusion Models [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab5412", "官方摘要")]
+
+该工作在多任务、多资产和随机初始条件的仿真中，以视频 Diffusion 生成机器人完成任务的视觉轨迹，再交给目标条件规划器恢复动作，从而无需人类示教生成物理约束轨迹。PHYSVIVID 数据集含 400 多个物体、5,000 多条示教；作者以此微调 Policy，并在未见物体、纹理、尺寸和类别上验证泛化。视频生成在这里不是单独的视觉增强，而由规划器把结果接回动作序列。
+
 = 4. 仿真与 Real-to-Sim
 
 Real-to-Sim 方法先重建真实场景，再在可控环境中生成交互数据、奖励或探索先验。两届工作都使用 Gaussian Splatting 缩小视觉差异，IROS 进一步强调动力学参数识别、持续适应和模拟--真实共训练。
@@ -244,6 +302,24 @@ SimLauncher 先在 Real-to-Sim 数字孪生中预训练视觉运动 Policy，再
 === Automatic Real-to-Sim-to-Real System through Iterative Interactions for Robust Robot Manipulation Policy Learning with Unseen Objects [#link("https://doi.org/10.1109/IROS60139.2025.11247488", "DOI")]
 
 ARIC 让机器人用预训练强化学习 Policy 反复改变物体姿态并自主观察，逐步改善三维重建，无需人工持相机扫描或手动摆动物体；随后在复制物体的仿真中训练任务 Policy，并零微调部署到真实环境。三个真实任务平均成功率为 83.3%。闭环采集减少人工成本，但依赖初始交互 Policy、可抓取物体和迭代重建的稳定性。
+
+== ICRA 2026
+
+=== Re^3Sim: Generating High-Fidelity Simulation Data Via 3D-Photorealistic Real-To-Sim for Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab1240", "官方摘要")]
+
+Re^3Sim 用三维重建和渲染重建真实操作场景，提供可实时渲染的跨视角相机，并在物理模拟器中以特权信息高效采集专家示教。作者以这些模拟示教训练模仿 Policy；仅用模拟数据时，零样本 Sim-to-Real 的平均成功率超过 58%，并进一步生成大规模模拟数据集。它同时处理几何和视觉差异，但真实接触与重建偏差仍是迁移边界。
+
+=== Few-Shot Neural Differentiable Simulator: Real-To-Sim Rigid-Contact Modeling [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab3999", "官方摘要")]
+
+该方法以少量真实数据校准解析模拟器，再由其产生覆盖多样接触的大规模合成数据，并在此基础上学习可微的网格 GNN 动力学模型。作者报告该模型在复现真实轨迹上优于可微基线，并在多物体交互中验证基于模拟的 Policy 学习和更高效率。其关键数据配方是少量真实 grounding 加大量物理一致模拟，而不是把神经模拟器完全脱离真实观测训练。
+
+=== NavGSim: High-Fidelity Gaussian Splatting Simulator for Large-Scale Navigation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab5457", "官方摘要")]
+
+NavGSim 用层级 Gaussian Splatting 构造覆盖数百平方米场景的导航模拟器，并从重建的 Gaussian 切片提取可通行区域，提供场景重建、机器人配置、Policy 训练与评测 API。作者以模拟器收集的轨迹训练 VLA，并在仿真和真实环境中评测，报告其场景理解可处理多样导航查询。该系统扩大的是导航轨迹与观测，而碰撞近似与真实地图更新仍需单独验证。
+
+=== NavDP: Learning Sim-To-Real Navigation Diffusion Policy with Privileged Information Guidance [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2328", "官方摘要")]
+
+NavDP 在模拟中构建超过 3,000 个场景、超过 100 万米导航经验的数据集，以特权信息监督同一 Transformer 的轨迹生成与评估，再从 RGB-D 观测零样本迁移。作者在模拟和真实环境中报告其优于既有方法，并公开数据集和代码。这里的扩展来自模拟中可观测而真实部署不可得的安全/危险监督，能否迁移依赖模拟环境的覆盖度。
 
 = 5. 触觉与多模态数据
 
@@ -297,6 +373,24 @@ AugInsert 用 Perceiver IO 融合视觉与力矩信息，并建立按因素控�
 
 Multi-Modal Dex 联合视觉、点云与运动学数据描述人手交互，并通过神经渲染和运动学优化，把人手与机器人手姿态对齐到共享规范空间，为灵巧模仿、感知和技能迁移提供多模态数据。它缓解了仅用 RGB 难以表达三维时空关系的问题。数据价值仍取决于规范空间的几何对齐、采集动作覆盖以及人手接触信息能否由现有模态充分恢复。
 
+== ICRA 2026
+
+=== ViTac-Tracing: Visual-Tactile Imitation Learning of Deformable Object Tracing [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab2293", "官方摘要")]
+
+ViTac-Tracing 在低成本遥操作端和机器人端引入触觉，以视觉--触觉模仿学习统一处理一维、二维可形变物体的 tracing。局部损失鼓励接触点停留在触觉图像中心，任务损失则约束整体进程；作者在多类物体上报告已见物体平均成功率 80%、未见物体 65%，并开放代码和数据集。它把触觉的价值落实到接触维持与轨迹进展，而非只把触觉追加为特征。
+
+=== TactileAloha: Learning Bimanual Manipulation with Tactile Sensing [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab143", "官方摘要")]
+
+TactileAloha 在 ALOHA 夹爪上安装触觉传感器，并将采集的触觉、视觉和本体感觉融合到 Transformer Policy，用于扎带插入与魔术贴固定等双臂任务。作者报告加入触觉后，相对既有含触觉方法平均提高约 11.0%，并能处理纯相机方法难以解决的纹理相关操作。提升依赖传感器所测纹理确实是任务的关键状态。
+
+=== ManipForce: Force-Guided Policy Learning with Frequency-Aware Representation for Contact-Rich Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4466", "官方摘要")]
+
+ManipForce 的手持采集系统在自然人类示教中同步记录高频力/力矩与 RGB，并以频率和模态感知嵌入、双向交叉注意力接入 Transformer Diffusion Policy。六项真实接触操作中，作者报告平均 83% 成功率且优于仅 RGB 基线；消融还支持高频力/力矩与跨模态融合的作用。系统将高频接触信号变为训练数据，但传感器频率和同步方式本身也是可迁移性的条件。
+
+=== Tactile-Conditioned Diffusion Policy for Force-Aware Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab3678", "官方摘要")]
+
+FARM 用配备 GelSight Mini 的手持 UMI 夹爪采集人类示教，并制造几何匹配的执行夹爪；Policy 同时预测机器人位姿、夹爪开度和抓握力。三类不同力需求任务的比较中，作者报告该力条件 Diffusion Policy 超过多个基线。它把高维触觉既用于推断力信号，也把力放进动作空间，因此需要采集端与部署端的几何对应。
+
 = 6. 数据配方与异构预训练
 
 最后一组关注模型如何使用已经扩大的异构数据。重点从单纯增加样本转向训练配方：哪些架构能够随多模态示教扩展，以及如何用语言把视觉、触觉和声音映射到共享语义空间。
@@ -329,13 +423,31 @@ PLARE 面向没有奖励标注的离线轨迹，让 VLM 根据语言任务描述
 
 ManiGaussian++ 用任务导向 Gaussian Splatting 表示中间视觉特征，并以主从层级世界模型分别预测稳定臂与操作臂引起的场景变化，从未来场景预测中学习双臂多体动力学。十项仿真任务相较现有方法提高 20.2%，九项真实双臂任务平均成功率为 60%。世界模型提高了数据中的动力学利用率，但依赖视觉预测质量，复杂接触和长时误差仍可能累积。
 
+== ICRA 2026
+
+=== SCIZOR: A Self-Supervised Approach to Data Curation for Large-Scale Imitation Learning [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab3237", "官方摘要")]
+
+SCIZOR 在状态--动作粒度筛选大规模示教：自监督任务进度预测器移除无进展样本，去重模块移除重复模式，不需要人工质量标注。作者报告该方法使模仿 Policy 和 VLA 在多个基准上以更少数据取得平均 15.4% 提升。它将数据量转化为有效训练预算，但筛选逻辑依赖任务进度能够由数据自身识别。
+
+=== Open-World Object Manipulation with Vision-Language-Action Models Via Synthetic Multi-Modal Data [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4789", "官方摘要")]
+
+ObjectVLA 的 Search2Scene 使用视觉--语言对合成图像--文本训练数据，在不为每个新目标收集人类示教的条件下，把对象知识接到 VLA 动作学习。作者在真实平台上对 100 个未参与训练的新对象评测，报告选择成功率为 64%。这是一种以语义数据补齐物体长尾的配方，仍取决于图文对能否表达任务所需的物理可供性。
+
+=== Scalable Vision-Language-Action Model Pretraining for Robotic Dexterous Manipulation with Real-Life Human Activity Videos [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab4856", "官方摘要")]
+
+该工作自动把无标注第一视角人手视频切为原子活动，并生成语言描述、逐帧三维手部与相机运动，构造与机器人 VLA 格式对齐的数据。作者处理得到 100 万个 episode、2,600 万帧的 hand-VLA 数据；预训练模型对未见真实观测表现出零样本能力，少量真实机器人动作数据微调后在真实实验中提高成功率与新物体泛化。数据规模来自人类活动视频，动作接口仍由真实机器人数据校正。
+
+=== CRAFT: Adapting VLA Models to Contact-Rich Manipulation Via Force-Aware Curriculum Fine-Tuning [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4351", "官方摘要")]
+
+CRAFT 以同构 leader--follower 遥操作采集同步视觉、语言与力数据，并通过课程微调让 VLA 先重视频和语言嵌入、再逐步恢复全部多模态输入。作者在真实接触丰富操作中报告，其方法能提升成功率、泛化到未见物体和任务变化，并适配多种 VLA 架构。它强调异构数据的配方不只是拼接模态，还要安排力信号在训练中的信息优先级。
+
 = 综合判断
 
-两届会议共同显示，数据扩展已经从“收集更多同构遥操作”转向“把不同来源转换为任务相关监督”。ICRA 的代表工作更集中于人类视频、少量示教生成、触觉表示和数据管理；IROS 则明显增加了 VR 与外骨骼采集系统、机器人视频合成、自动 Real-to-Sim、触觉数字孪生以及模拟--真实共训练。
+三部分共同显示，数据扩展已经从“收集更多同构遥操作”转向“把不同来源转换为任务相关监督”。ICRA 2025 的代表工作更集中于人类视频、少量示教生成、触觉表示和数据管理；IROS 2025 明显增加了 VR 与外骨骼采集系统、机器人视频合成、自动 Real-to-Sim、触觉数字孪生以及模拟--真实共训练；ICRA 2026 则进一步把规模化采集、可穿戴人类数据、物理约束生成、真实场景模拟与数据筛选连成更明确的生命周期。
 
 最有潜力的方法通常同时处理“规模”和“接口”。EgoMimic、Motion Tracks、RwoR 与 RoboSwap 寻找人类或异构机器人数据进入目标本体的中间表示；ForceMimic、PolyTouch、TacCap 与 TwinTac 为稀缺接触信号建立采集或模拟接口；ReBot、RoboEngine 和 DiffGen 则把视觉生成约束到已有轨迹、机器人分割或可微物理上。单纯生成逼真图像并不自动产生控制价值，合成数据仍需满足动作--观测一致性、接触物理和目标分布匹配。
 
-对资源有限的研究者而言，一条实际路线是：先用少量高质量真实示教确定任务不变量，再按缺口扩展数据。视觉与空间变化可优先使用几何增强、机器人替换或三维重建；接触任务应保留力、触觉或声学监督；跨本体问题应避免直接绑定关节动作；需要在线学习时，可用模拟 Policy 提供初始 Rollout 或动作建议，但必须以真实数据抬高性能上限。最终应通过真实 Rollout 验证新增数据是否扩展了 Policy 支持集，而非只增加训练文件数量。
+对资源有限的研究者而言，一条实际路线是：先用少量高质量真实示教确定任务不变量，再按缺口扩展数据。视觉与空间变化可优先使用几何增强、机器人替换或三维重建；接触任务应保留力、触觉或声学监督；跨本体问题应避免直接绑定关节动作；需要在线学习时，可用模拟 Policy 提供初始 Rollout 或动作建议，但必须以真实数据抬高性能上限。MOVE、COBALT、FreeTacMan 和 SCIZOR 还提示一个容易被忽略的层面：采集吞吐、传感同步和样本筛选都应同 Policy 一起评测。最终应通过真实 Rollout 验证新增数据是否扩展了 Policy 支持集，而非只增加训练文件数量。
 
 = 来源与范围
 
@@ -343,4 +455,6 @@ ManiGaussian++ 用任务导向 Gaussian Splatting 表示中间视觉特征，并
 - #link("https://dblp.org/db/conf/iros/iros2025.xml", "DBLP: IROS 2025 Proceedings XML")，用于确定 1,985 篇正式论文及 DOI。
 - #link("https://www.semanticscholar.org/", "Semantic Scholar")，按 DOI 批量补全公开摘要、arXiv 与开放获取信息。
 - #link("https://2025.ieee-icra.org/program/awards-and-finalists/", "ICRA 2025 Awards and Finalists")，用于核对获奖论文。
-- 自动主题评分只用于召回，最终 ICRA 32 篇与 IROS 31 篇均由人工审计确定；本文不等价于两届会议的全领域最佳论文榜单。
+- #link("https://ras.papercept.net/conferences/conferences/ICRA26/program/", "ICRA 2026 官方 PaperCept 程序")及其中三个静态内容页，用于 ICRA 2026 的代码、作者--机构顺序、关键词、摘要和展示类型；抓取快照的源页面更新时间为 2026-06-08。该范围固定表述为 *ICRA 2026 peer-reviewed conference presentations*，不称为 IEEE Xplore proceedings，也不推断 DOI 或 PDF。
+- #link("https://2026.ieee-icra.org/contribute/final-paper-submission-instructions/", "ICRA 2026 Final Paper Submission Instructions")，用于核对正式投稿的会议语境；#link("https://2026.ieee-icra.org/contribute/call-for-late-breaking-results/", "ICRA 2026 Call for Late Breaking Results")明确 LBR 为非同行评议、非出版物，因此从 2,951 条程序行中排除 131 条。
+- 自动主题评分只用于召回，最终 ICRA 32 篇、IROS 31 篇与 ICRA 2026 的 25 篇均由人工审计确定；ICRA 2026 的 110 篇高召回短名单、评分规则和入选代码保存在 `tools/icra2026/selection.json`。本文不等价于三届会议的全领域最佳论文榜单。
