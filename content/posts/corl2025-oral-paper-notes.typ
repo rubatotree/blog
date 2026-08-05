@@ -66,6 +66,8 @@ X-Sim 不直接把人手动作映射成机器人关节，而把物体运动视�
 
 == 9. Real2Render2Real: Scaling Robot Data Without Dynamics Simulation or Robot Hardware [#link("https://openreview.net/forum?id=VVhAhzr2WV", "OpenReview")]
 
+用单条人手交互数据生成大量合成示教数据。本文认为示教数据的关键信息是交互对象的运动序列。不考虑碰撞，仅扫描交互对象的 3DGS 外观和位置序列，IK 生成机械臂动作，在渲染器中播放交互对象之间的动画形成示教序列。随机化在于可以随机化交互对象的初始位置和环境外观。
+
 R2R2R 输入手机扫描和一段人类演示，用 3DGS 重建外观与几何、追踪物体六自由度运动，再从不同机器人视角渲染数千条轨迹。方法刻意关闭碰撞动力学，只生成适用于 VLA 和模仿学习的视觉与本体状态数据。作者称单条人类演示生成的数据可以匹配 150 条遥操作示教的训练效果。这是用“外观与运动合成”绕开昂贵动力学仿真的激进路线，适合轨迹可迁移的任务，但难以覆盖接触力、失败恢复和由机器人动作改变的真实动力学。
 
 == 10. AirExo-2: Scaling up Generalizable Robotic Imitation Learning with Low-Cost Exoskeletons [#link("https://openreview.net/forum?id=ksOrtEgIC0", "OpenReview")]
