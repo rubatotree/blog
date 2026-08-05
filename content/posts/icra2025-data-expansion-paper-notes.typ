@@ -14,7 +14,7 @@
   ```,
 )
 
-本文联合整理 ICRA 2025、IROS 2025 与 ICRA 2026 的数据扩展工作。ICRA 2025 Proceedings 收录 1,604 篇论文并补全 1,602 篇摘要，自动召回 279 篇候选后人工保留 32 篇；IROS 2025 Proceedings 收录 1,985 篇论文并补全 1,983 篇摘要，从 309 篇候选中人工保留 31 篇。ICRA 2026 则依据官方 PaperCept 程序的 *ICRA 2026 peer-reviewed conference presentations*：2,951 条程序行中排除 131 条非同行评议、非出版物的 Late Breaking Results，保留 2,820 条展示（2,604 个 interactive、216 个 oral）；其中 2,639 条提供官方关键词与摘要。该届自动高召回 110 篇，人工审计后保留 25 篇。三部分合计审计 6,409 条正式论文或同行评议展示，在同一主题框架下比较机器人数据如何被采集、转换、合成、筛选和复用。
+本文联合整理 ICRA 2025、IROS 2025 与 ICRA 2026 的数据扩展工作。ICRA 2025 Proceedings 收录 1,604 篇论文并补全 1,602 篇摘要，自动召回 279 篇候选并初审 32 篇；IROS 2025 Proceedings 收录 1,985 篇论文并补全 1,983 篇摘要，从 309 篇候选初审 31 篇。ICRA 2026 则依据官方 PaperCept 程序的 *ICRA 2026 peer-reviewed conference presentations*：2,951 条程序行中排除 131 条非同行评议、非出版物的 Late Breaking Results，保留 2,820 条展示（2,604 个 interactive、216 个 oral）；其中 2,639 条提供官方关键词与摘要。复审把官方摘要纳入生命周期匹配、将 5 分项纳入人工复核带，当前快照自动召回 451 篇候选并人工审计 35 篇。随后以同一“数据--下游 Policy/控制”门槛复核渲染与光照方向，额外补入 ICRA 2025 的 2 篇与 IROS 2025 的 3 篇；正文当前分别覆盖 34、34、35 篇。三部分合计审计 6,409 条正式论文或同行评议展示，在同一主题框架下比较机器人数据如何被采集、转换、合成、筛选和复用。
 
 这里的“数据扩展”不只指增加轨迹数量，也包括降低采集成本、吸收人类视频、跨本体共享监督、生成物理可执行数据、复用失败示教，以及让触觉和声音等稀缺模态进入通用 Policy。每篇整理基于公开摘要，实验数字均指作者报告的结果。ICRA 2026 的中文小结只改写 PaperCept 官方关键词和摘要，不推断 DOI、PDF 或 IEEE Xplore 可用性。
 
@@ -110,6 +110,10 @@ Humanoid Everyday 通过人类监督遥操作收集人形机器人全身操作�
 === TWIST2: Scalable, Portable, and Holistic Humanoid Data Collection System [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab235", "官方摘要")]
 
 TWIST2 用无动捕的 VR 全身运动和低成本机器人颈部相机进行第一视角人到人形机器人的遥操作，目标是同时保留全身控制与便携性。作者报告 15 分钟可收集 100 条示教且成功率接近 100%，并以采集数据训练分层视觉运动 Policy，展示全身灵巧操作和动态踢球。性能仍受人机运动映射和所用人形平台能力限制。
+
+=== RealMirror: A Comprehensive, Open-Source Vision-Language-Action Platform for Embodied AI [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2835", "官方摘要")]
+
+RealMirror 将低成本数据采集、模型训练与推理接口放入同一开源人形 VLA 平台，并提供含多场景、轨迹与多类 VLA 的基准。其生成模型和 3D Gaussian Splatting 重建场景与机器人模型，摘要报告仅用模拟训练即可零样本迁移到真实机器人，无需微调。它把数据接口、评测轨迹和 Real-to-Sim 打包为基础设施，但不同场景和硬件上的迁移仍取决于重建与执行器建模。
 
 = 2. 人类视频与跨本体监督
 
@@ -263,6 +267,18 @@ SoftMimicGen 面向刚体合成数据难覆盖的可形变操作，提供包含�
 
 该工作在多任务、多资产和随机初始条件的仿真中，以视频 Diffusion 生成机器人完成任务的视觉轨迹，再交给目标条件规划器恢复动作，从而无需人类示教生成物理约束轨迹。PHYSVIVID 数据集含 400 多个物体、5,000 多条示教；作者以此微调 Policy，并在未见物体、纹理、尺寸和类别上验证泛化。视频生成在这里不是单独的视觉增强，而由规划器把结果接回动作序列。
 
+=== AnchorDream: Repurposing Video Diffusion for Embodiment-Aware Robot Data Synthesis [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab4601", "官方摘要")]
+
+AnchorDream 从少量人类遥操作示教开始，以机器人运动渲染作为 Video Diffusion 的条件，约束本体运动并合成与运动学一致的物体和环境；它不要求显式环境建模。摘要报告生成数据使下游 Policy 在仿真基准相对提高 36.4%，真实研究中的性能接近翻倍。该方向把世界模型的生成能力绑定到机器人动作，而其可用范围仍由种子示教和目标本体运动学决定。
+
+=== Physically-Based Lighting Generation for Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab1192", "官方摘要")]
+
+该方法对已有真实人类操作示教的首帧做物理逆渲染，分离几何与材质后重打不同光源，再以机器人执行视频微调 Stable Video Diffusion，维持序列中的光照时序一致性。作者在六种未见真实光照条件下报告模仿学习 Policy 性能提高 38.75%，并展示背景、纹理和干扰物生成。这里的关键不是单帧渲染质量，而是把光照变化保持为可用于 Policy 的示教序列；材质分解和时序传播误差会限制增广可靠性。
+
+=== Unsupervised Domain Adaptation for Robust Imitation Learning under Visual Perturbations [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab3685", "官方摘要")]
+
+该工作先以数据增强学习对视觉域移位更稳健的特征，再只用目标环境中易采集的初始图像进行无监督适应，避免为每个新环境采集完整的动作标注 Episode。仿真与实体机器人实验覆盖光照、背景和干扰物变化，摘要报告在保持源域性能的同时提高扰动鲁棒性。它把目标域数据需求压缩为图像观测，但初始观测能否代表实际执行中的域移位仍是边界。
+
 = 4. 仿真与 Real-to-Sim
 
 Real-to-Sim 方法先重建真实场景，再在可控环境中生成交互数据、奖励或探索先验。两届工作都使用 Gaussian Splatting 缩小视觉差异，IROS 进一步强调动力学参数识别、持续适应和模拟--真实共训练。
@@ -281,6 +297,14 @@ Real-to-Sim 方法先重建真实场景，再在可控环境中生成交互数�
 
 开放环境中的操作任务需要能随人类意图和反馈变化的任务规格，固定奖励难以覆盖多步行为。IKER 让 VLM 根据 RGB-D 观测和自由语言指令采样场景关键点，并生成基于关键点空间关系的 Python 奖励函数，以支持精确 SE(3) 控制和迭代修正。作者将真实场景重建到模拟器中，用生成奖励训练 RL Policy，再部署回真实环境；实验覆盖抓取和非抓取操作，并观察到多步执行、错误恢复和在线策略调整。其效果取决于关键点定位、VLM 常识先验和 Real-to-Sim 重建质量。
 
+=== VisFly: An Efficient and Versatile Simulator for Training Vision-Based Flight [#link("https://doi.org/10.1109/ICRA55743.2025.11128458", "DOI") / #link("https://arxiv.org/abs/2407.14783", "arXiv")]
+
+VisFly 将 Habitat-Sim 渲染、可微物理和 Gym 接口合成四旋翼视觉飞行的运动与传感数据，摘要报告渲染速度超过每秒 10,000 帧，并可直接导入开放场景数据集以同时训练多种真实环境。作者提供三项以视觉观测为输入的强化学习飞行示例。它的贡献在于提高从场景到 Policy 的合成数据吞吐，而速度与视觉保真度并不能替代对真实动力学和传感误差的验证。
+
+=== FlightForge: Advancing UAV Research with Procedural Generation of High-Fidelity Simulation and Integrated Autonomy [#link("https://doi.org/10.1109/ICRA55743.2025.11127704", "DOI") / #link("https://arxiv.org/abs/2502.05038", "arXiv")]
+
+FlightForge 以程序化环境生成、高级渲染和多种控制模态构成开源 UAV 模拟器，并把完整自主飞行系统接入其中，避免手工场景只能覆盖有限范围的局限。摘要报告其传感器渲染能力优于所比较模拟器，且可在杂乱、未知、近乎无限延展的环境中验证长距离自主导航。它扩展的是场景分布与系统级测试接口，性能边界取决于程序化环境和真实传感器之间的覆盖差异。
+
 == IROS 2025
 
 === LoopSR: Looping Sim-and-Real for Lifelong Policy Adaptation of Legged Robots [#link("https://doi.org/10.1109/IROS60139.2025.11246873", "DOI") / #link("https://arxiv.org/abs/2409.17992", "arXiv")]
@@ -290,6 +314,18 @@ LoopSR 针对域随机化难以兼顾通用鲁棒性和特定环境性能的问�
 === DISCOVERSE: Efficient Robot Simulation in Complex High-Fidelity Environments [#link("https://doi.org/10.1109/IROS60139.2025.11247559", "DOI") / #link("https://arxiv.org/abs/2507.21981", "arXiv")]
 
 DISCOVERSE 将 Gaussian Splatting 的真实场景外观与 MuJoCo 物理结合，形成模块化开源 Real2Sim2Real 平台，支持多传感器并行模拟、现有三维资产、机器人模型和 ROS 插件。模仿学习实验中，其零样本 Sim-to-Real 表现优于对比模拟器。平台扩展了高保真合成数据吞吐，但视觉 Gaussian 与物理几何的同步、接触建模和真实重建质量仍决定迁移上限。
+
+=== GRASPLAT: Enabling dexterous grasping through novel view synthesis [#link("https://doi.org/10.1109/IROS60139.2025.11246749", "DOI") / #link("https://arxiv.org/abs/2510.19200", "arXiv")]
+
+GRASPLAT 用 3D Gaussian Splatting 从真实手--物交互生成高保真、物理上合理的新视角图像，并以这些 RGB 图像端到端回归成功抓取对应的手部关节；光度损失再缩小渲染与真实图像的差异。摘要报告在合成和真实抓取数据上，成功率相对既有图像方法最高提高 36.9%。该管线用可合成视角缓解完整三维扫描的采集负担，前提是渲染视角仍保留抓取所需的几何信息。
+
+=== FalconGym: A Photorealistic Simulation Framework for Zero-Shot Sim-to-Real Vision-Based Quadrotor Navigation [#link("https://doi.org/10.1109/IROS60139.2025.11247178", "DOI") / #link("https://arxiv.org/abs/2503.02198", "arXiv")]
+
+FalconGym 以 NeRF 建立真实感四旋翼赛道，提供近乎无限的合成训练图像；其视觉姿态估计与多模态控制器完全在模拟器内以模仿学习训练，再零微调部署到真机。摘要报告 30 次真机飞行、三条赛道共 120 个门中取得 95.8% 成功率，平均过门误差为 10 cm。合成图像在这里服务于闭环飞行控制，仍需依赖赛道几何、动力学和视觉噪声的共同匹配。
+
+=== ArtGS: 3D Gaussian Splatting for Interactive Visual-Physical Modeling and Manipulation of Articulated Objects [#link("https://doi.org/10.1109/IROS60139.2025.11246522", "DOI") / #link("https://arxiv.org/abs/2507.02600", "arXiv")]
+
+ArtGS 从多视 RGB-D 重建出发，以 VLM 提取关节对象的语义与骨架，再以动态、可微 3DGS 优化关节参数和物理一致的运动约束，进入闭环操作 Policy。作者在仿真和真实环境比较关节估计与操作成功率，摘要称其优于既有方法。它把视觉重建转为可交互的关节对象模型，但对多视重建、关节语义和物理约束质量都有依赖。
 
 === SimLauncher: Launching Sample-Efficient Real-World Robotic Reinforcement Learning via Simulation Pre-Training [#link("https://doi.org/10.1109/IROS60139.2025.11246668", "DOI") / #link("https://arxiv.org/abs/2507.04452", "arXiv")]
 
@@ -308,6 +344,26 @@ ARIC 让机器人用预训练强化学习 Policy 反复改变物体姿态并自�
 === Re^3Sim: Generating High-Fidelity Simulation Data Via 3D-Photorealistic Real-To-Sim for Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab1240", "官方摘要")]
 
 Re^3Sim 用三维重建和渲染重建真实操作场景，提供可实时渲染的跨视角相机，并在物理模拟器中以特权信息高效采集专家示教。作者以这些模拟示教训练模仿 Policy；仅用模拟数据时，零样本 Sim-to-Real 的平均成功率超过 58%，并进一步生成大规模模拟数据集。它同时处理几何和视觉差异，但真实接触与重建偏差仍是迁移边界。
+
+=== GSWorld: Closed-Loop Photo-Realistic Simulation Suite for Robotic Manipulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab580", "官方摘要")]
+
+GSWorld 把 3D Gaussian Splatting 与物理引擎结合，并以同时包含 Gaussian-on-Mesh、机器人 URDF 与物体的 GSDF 资产格式组织场景；摘要列出三种机器人本体和 40 多个物体。系统展示零样本像素到动作 Sim-to-Real、部署环境中的自动 DAgger 纠错采集、虚拟遥操作采集、真实 Policy 的可复现实验与视觉强化学习。它把资产、采集、纠错和评测接成数据闭环，接触与资产重建质量仍决定闭环能否代表真实失效分布。
+
+=== Real-Is-Sim: Bridging the Sim-To-Real Gap with a Dynamic Digital Twin [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab819", "官方摘要")]
+
+Real-Is-Sim 以 Embodied Gaussian 动态数字孪生在 60 Hz 与真实环境同步；Policy 始终作用在模拟机器人，实体机器人跟随模拟关节状态，且模拟持续由真实测量修正。除比较虚拟评测与真实结果外，作者还用虚拟 Rollout 增广真实数据，并在 PushT 操作上研究用于行为克隆的不同模拟状态表示。它将 Sim-to-Real 的负担转移给同步机制，收益依赖数字孪生能否持续跟上真实接触和外观变化。
+
+=== One Prompt, Many Rooms: A Force-Directed Approach to 3D Scene Generation for Robotics Simulation [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab2738", "官方摘要")]
+
+One Prompt, Many Rooms 让 LLM 生成单个声明式场景计划，再用力导向物理模拟产生语义相同而几何不同的多个布局，以避免反复文本采样带来的成本和不一致。作者将生成场景迁移到 Replica 的真实环境三维重建中训练导航 Agent，摘要报告成功率为 0.84。该方法以受控布局多样性扩大训练分布，但场景计划的语义覆盖和物理布置的可信度仍会限制迁移。
+
+=== Performance-Guided Refinement for Visual Aerial Navigation Using Editable Gaussian Splatting in FalconGym 2.0 [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab1844", "官方摘要")]
+
+FalconGym 2.0 以可编辑 Gaussian Splatting 场景在毫秒级生成静态和动态赛道，再用 Performance-Guided Refinement 将视觉 Policy 的训练集中在困难赛道并迭代更新。固定翼和四旋翼两项研究中，单一 Policy 泛化到三条未见赛道；摘要还报告其零样本迁移到真机四旋翼，在 30 次试验、69/70 个门上达到 98.6%。它把生成赛道作为主动选择的训练数据，而非仅提高渲染质量。
+
+=== DextrAH-RGB: Visuomotor Policies to Grasp Anything with Dexterous Hands [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab1925", "官方摘要")]
+
+DextrAH-RGB 先在模拟中以强化学习训练几何 fabric controller，再借助照片级平铺渲染将其蒸馏为 RGB 视觉运动 Policy，整个 RGB Policy 训练过程不依赖真实数据。作者展示其可零样本迁移到多指灵巧抓取的真实场景，并在多种真实光照、材质和纹理条件下保持鲁棒。这里的渲染数据被直接用于动作 Policy 蒸馏；真实物体和接触的覆盖范围仍决定泛化边界。
 
 === Few-Shot Neural Differentiable Simulator: Real-To-Sim Rigid-Contact Modeling [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab3999", "官方摘要")]
 
@@ -391,6 +447,10 @@ ManipForce 的手持采集系统在自然人类示教中同步记录高频力/�
 
 FARM 用配备 GelSight Mini 的手持 UMI 夹爪采集人类示教，并制造几何匹配的执行夹爪；Policy 同时预测机器人位姿、夹爪开度和抓握力。三类不同力需求任务的比较中，作者报告该力条件 Diffusion Policy 超过多个基线。它把高维触觉既用于推断力信号，也把力放进动作空间，因此需要采集端与部署端的几何对应。
 
+=== DOT-Sim: Differentiable Optical Tactile Simulation with Precise Real-To-Sim Physical Calibration [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab2771", "官方摘要")]
+
+DOT-Sim 将光学触觉传感器建模为基于 MPM 的弹性材料，并学习相对于真实静止图像的光学残差；少量示教即可在数分钟内完成模拟器校准。摘要报告该系统能生成接触丰富情形中的真实感光学输出，将模拟训练分类器直接部署到真实世界，并让从模拟示教训练的 Policy 以小于 0.9 mm 的平均误差跟踪轨迹。它以少量真实数据锚定可复用的触觉模拟，传感器材料与光学建模失配仍会传入下游控制。
+
 = 6. 数据配方与异构预训练
 
 最后一组关注模型如何使用已经扩大的异构数据。重点从单纯增加样本转向训练配方：哪些架构能够随多模态示教扩展，以及如何用语言把视觉、触觉和声音映射到共享语义空间。
@@ -439,15 +499,15 @@ ObjectVLA 的 Search2Scene 使用视觉--语言对合成图像--文本训练数�
 
 === CRAFT: Adapting VLA Models to Contact-Rich Manipulation Via Force-Aware Curriculum Fine-Tuning [#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4351", "官方摘要")]
 
-CRAFT 以同构 leader--follower 遥操作采集同步视觉、语言与力数据，并通过课程微调让 VLA 先重视频和语言嵌入、再逐步恢复全部多模态输入。作者在真实接触丰富操作中报告，其方法能提升成功率、泛化到未见物体和任务变化，并适配多种 VLA 架构。它强调异构数据的配方不只是拼接模态，还要安排力信号在训练中的信息优先级。
+CRAFT 以同构 leader--follower 遥操作采集同步视觉、语言与力数据，并通过课程微调在早期压制并调节视觉--语言嵌入，以优先利用力信号，再逐步恢复完整多模态输入。作者在真实接触丰富操作中报告，其方法能提升成功率、泛化到未见物体和任务变化，并适配多种 VLA 架构。它强调异构数据的配方不只是拼接模态，还要安排力信号在训练中的信息优先级。
 
 = 综合判断
 
-三部分共同显示，数据扩展已经从“收集更多同构遥操作”转向“把不同来源转换为任务相关监督”。ICRA 2025 的代表工作更集中于人类视频、少量示教生成、触觉表示和数据管理；IROS 2025 明显增加了 VR 与外骨骼采集系统、机器人视频合成、自动 Real-to-Sim、触觉数字孪生以及模拟--真实共训练；ICRA 2026 则进一步把规模化采集、可穿戴人类数据、物理约束生成、真实场景模拟与数据筛选连成更明确的生命周期。
+三部分共同显示，数据扩展已经从“收集更多同构遥操作”转向“把不同来源转换为任务相关监督”。ICRA 2025 的代表工作更集中于人类视频、少量示教生成、触觉表示和数据管理；IROS 2025 明显增加了 VR 与外骨骼采集系统、机器人视频合成、自动 Real-to-Sim、触觉数字孪生以及模拟--真实共训练；ICRA 2026 则进一步把规模化采集、可穿戴人类数据、物理约束生成、真实场景模拟与数据筛选连成更明确的生命周期。复审还表明，渲染和光照不是独立的“视觉增强”类别：只有当它们生成或适应可用于 Policy/控制的序列、重建训练/评测接口，并有下游证据时，才应计入数据扩展。
 
 最有潜力的方法通常同时处理“规模”和“接口”。EgoMimic、Motion Tracks、RwoR 与 RoboSwap 寻找人类或异构机器人数据进入目标本体的中间表示；ForceMimic、PolyTouch、TacCap 与 TwinTac 为稀缺接触信号建立采集或模拟接口；ReBot、RoboEngine 和 DiffGen 则把视觉生成约束到已有轨迹、机器人分割或可微物理上。单纯生成逼真图像并不自动产生控制价值，合成数据仍需满足动作--观测一致性、接触物理和目标分布匹配。
 
-对资源有限的研究者而言，一条实际路线是：先用少量高质量真实示教确定任务不变量，再按缺口扩展数据。视觉与空间变化可优先使用几何增强、机器人替换或三维重建；接触任务应保留力、触觉或声学监督；跨本体问题应避免直接绑定关节动作；需要在线学习时，可用模拟 Policy 提供初始 Rollout 或动作建议，但必须以真实数据抬高性能上限。MOVE、COBALT、FreeTacMan 和 SCIZOR 还提示一个容易被忽略的层面：采集吞吐、传感同步和样本筛选都应同 Policy 一起评测。最终应通过真实 Rollout 验证新增数据是否扩展了 Policy 支持集，而非只增加训练文件数量。
+对资源有限的研究者而言，一条实际路线是：先用少量高质量真实示教确定任务不变量，再按缺口扩展数据。视觉与空间变化可优先使用几何增强、机器人替换、三维重建或可控光照重渲染；接触任务应保留力、触觉或声学监督；跨本体问题应避免直接绑定关节动作；需要在线学习时，可用模拟 Policy 提供初始 Rollout 或动作建议，但必须以真实数据抬高性能上限。MOVE、COBALT、FreeTacMan 和 SCIZOR 还提示一个容易被忽略的层面：采集吞吐、传感同步和样本筛选都应同 Policy 一起评测。最终应通过真实 Rollout 验证新增数据是否扩展了 Policy 支持集，而非只增加训练文件数量。
 
 = 来源与范围
 
@@ -457,4 +517,4 @@ CRAFT 以同构 leader--follower 遥操作采集同步视觉、语言与力数�
 - #link("https://2025.ieee-icra.org/program/awards-and-finalists/", "ICRA 2025 Awards and Finalists")，用于核对获奖论文。
 - #link("https://ras.papercept.net/conferences/conferences/ICRA26/program/", "ICRA 2026 官方 PaperCept 程序")及其中三个静态内容页，用于 ICRA 2026 的代码、作者--机构顺序、关键词、摘要和展示类型；抓取快照的源页面更新时间为 2026-06-08。该范围固定表述为 *ICRA 2026 peer-reviewed conference presentations*，不称为 IEEE Xplore proceedings，也不推断 DOI 或 PDF。
 - #link("https://2026.ieee-icra.org/contribute/final-paper-submission-instructions/", "ICRA 2026 Final Paper Submission Instructions")，用于核对正式投稿的会议语境；#link("https://2026.ieee-icra.org/contribute/call-for-late-breaking-results/", "ICRA 2026 Call for Late Breaking Results")明确 LBR 为非同行评议、非出版物，因此从 2,951 条程序行中排除 131 条。
-- 自动主题评分只用于召回，最终 ICRA 32 篇、IROS 31 篇与 ICRA 2026 的 25 篇均由人工审计确定；ICRA 2026 的 110 篇高召回短名单、评分规则和入选代码保存在 `tools/icra2026/selection.json`。本文不等价于三届会议的全领域最佳论文榜单。
+- 自动主题评分只用于召回。ICRA 2025 和 IROS 2025 的初审分别为 32 篇与 31 篇；针对渲染/光照且有“数据--Policy/控制”闭环证据的复审各补入 2 篇与 3 篇。ICRA 2026 的当前短名单为 451 篇、人工审计 35 篇，评分规则和入选代码保存在 `tools/icra2026/selection.json`；跨会议复审的纳入与排除理由保存在 `tools/paper_audits/lighting_rendering.json`。本文不等价于三届会议的全领域最佳论文榜单。

@@ -20,7 +20,19 @@
 
 因此，具身智能面对的不是简单的样本数量不足，而是*有效监督密度不足*：大量可获得数据没有动作，大量动作只适用于一种机器人；成功示教覆盖狭窄，接触与失败信息又经常没有被记录。与此同时，已经采集的数据还可能因为格式、压缩、同步和训练读取成本而无法被有效使用。
 
-本文使用的会议证据来自公开标题与摘要；具体实验设置、指标定义和失败案例仍需回查论文全文。在原有 CoRL 2025 Oral 与 RSS 2026 整理之上，本文加入 ICRA 与 IROS 2025 的摘要级系统整理。针对后两届会议，本项目共全量收录 3,589 篇正式论文，并依据标题与摘要筛选出 63 篇数据扩展工作；详细笔记见 #link("../icra2025-data-expansion-paper-notes/", "联合速览")。本文不再逐篇复述摘要，而是回答一个更实用的问题：研究者正在把哪些廉价信息，通过什么接口和验证器，转换成哪些可执行的机器人监督？
+本文使用的会议证据来自公开标题与摘要；具体实验设置、指标定义和失败案例仍需回查论文全文。在原有 CoRL 2025 Oral 与 RSS 2026 整理之上，本文加入 ICRA 与 IROS 2025 的摘要级系统整理，并补入 ICRA 2026。前两届收录 3,589 篇正式 proceedings 论文并筛选 63 篇数据扩展工作；ICRA 2026 则从官方 PaperCept 程序的 2,951 条行中排除 131 条 Late Breaking Results，保留 2,820 条 *peer-reviewed conference presentations*，其中 2,639 条有官方关键词与摘要，并从 110 篇高召回短名单人工审计出 25 篇。详细笔记见 #link("../icra2025-data-expansion-paper-notes/", "联合速览")。本文不再逐篇复述摘要，而是回答一个更实用的问题：研究者正在把哪些廉价信息，通过什么接口和验证器，转换成哪些可执行的机器人监督？
+
+= ICRA 2026 更新：数据荒正在变成数据生命周期问题
+
+ICRA 2026 的增量不只是更多数据集，而是把采集、转换、生成、验证和筛选接成闭环。数据入口上，#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab3809", "COBALT") 将手机与云端遥操作结合，摘要报告五天、九国采得 7,500 多条示教；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2650", "FreeTacMan") 则以可穿戴夹爪同步采集视觉、触觉和位姿，发布超过 300 万组配对观测与 1 万条轨迹。两者共同说明，数据荒首先可由采集接口、同步和质量控制缓解，而非只靠事后扩充训练集。
+
+人类数据的角色也更明确地从“替代机器人动作”转成“提供可转换的先验”。#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab6343", "EMMA") 将人类全身移动操作与静态机器人数据共同训练，避开移动遥操作；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_4.html#Ab3734", "Masquerade") 将自然第一视角视频编辑为带目标机器人外观和末端轨迹的示教；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab1478", "Real2Gen") 从单段人类示教转入仿真再生成训练数据。共同的不变量不再是人类关节，而是对象、任务进程、末端几何或可在仿真中验证的任务条件。
+
+物理约束生成与 Real-to-Sim 因而承担了扩大可信邻域的工作。#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2931", "UltraDexGrasp") 以抓取合成和规划生成 2,000 万帧数据，并报告纯合成训练的双臂抓取 Policy 能零样本迁移；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab1240", "Re^3Sim") 将真实场景重建为可采专家示教的模拟环境；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab2328", "NavDP") 把模拟中的特权安全监督变成跨 3,000 个场景的导航经验。这些方法不是让生成模型替代物理，而是把生成限制在可规划、可碰撞检查或可由真实场景锚定的范围内。
+
+接触模态继续暴露 RGB 数据的盲区。#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4466", "ManipForce") 用高频力/力矩和 RGB 人类示教训练 Policy，并在六项真实任务报告平均 83% 成功率；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab3678", "FARM") 则把触觉条件的力直接纳入动作空间。新增模态的价值不在传感器数量，而在观测、接触力和控制命令是否仍描述同一物理事件。
+
+最后，扩展后的数据需要被选择和配方化。#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab3237", "SCIZOR") 在状态--动作粒度剔除无进展和重复片段，作者报告可让模仿 Policy 与 VLA 用更少数据取得更高表现；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html#Ab4856", "人类活动 VLA 预训练") 把无标注第一视角手部视频转为 100 万 episode 的训练数据；#link("https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_5.html#Ab4351", "CRAFT") 先压制并调节视觉--语言嵌入以优先利用力信号，再恢复完整多模态输入。数据荒由此转化为一个配方问题：每类数据在何种训练阶段、以何种接口和质量条件进入 Policy。
 
 = 1. “缺数据”实际缺什么
 
@@ -140,7 +152,7 @@ IROS 的 #link("https://doi.org/10.1109/IROS60139.2025.11246304", "Sim-and-Real 
 
 = 结语
 
-CoRL 2025、ICRA 2025、IROS 2025 与 RSS 2026 的共同信号不是“规模已经不重要”，而是规模、采集系统和监督设计正在共同演化。受约束的大规模生成仍然有效，低成本 VR、外骨骼和众包仍然重要；但几何与物理约束决定可执行性，数据配方决定目标相关性，真实评测决定模拟扩展何时饱和。
+CoRL 2025、ICRA 2025、IROS 2025、RSS 2026 与 ICRA 2026 的共同信号不是“规模已经不重要”，而是规模、采集系统和监督设计正在共同演化。ICRA 2026 特别表明：若采集接口、人类数据转换、物理约束生成、接触记录和样本筛选彼此脱节，任何单一数据源都难以形成可复用的训练支持；反之，数据生命周期可以成为可优化的系统。受约束的大规模生成仍然有效，低成本 VR、外骨骼和众包仍然重要；但几何与物理约束决定可执行性，数据配方决定目标相关性，真实评测决定模拟扩展何时饱和。
 
 最有价值的进展往往在重新定义“什么可以算作监督”：物体运动可以替代人体关节，单次示教可以定义受约束的局部分布，真实轨迹可以锚定合成视频，数字孪生可以补足缺失传感器，失败可以成为奖励和安全边界。真正可扩展的机器人学习系统，需要的不是一份静态大数据集，而是一条能持续判断缺什么、为什么缺、下一条数据应从哪里来的闭环。
 
@@ -151,4 +163,5 @@ CoRL 2025、ICRA 2025、IROS 2025 与 RSS 2026 的共同信号不是“规模已
 - #link("https://dblp.org/db/conf/iros/iros2025.xml", "DBLP: IROS 2025 Proceedings")。
 - #link("https://roboticsconference.org/program/papers/", "Robotics: Science and Systems 2026: Papers")。
 - #link("../icra2025-data-expansion-paper-notes/", "ICRA 与 IROS 2025 数据扩展论文速览") 收录两届会议的 63 篇详细笔记。
+- #link("https://ras.papercept.net/conferences/conferences/ICRA26/program/", "ICRA 2026 官方 PaperCept 程序")，用于 ICRA 2026 的展示元数据与官方摘要；范围为 *ICRA 2026 peer-reviewed conference presentations*，不推断 IEEE Xplore、DOI 或 PDF 可用性。#link("https://2026.ieee-icra.org/contribute/call-for-late-breaking-results/", "Late Breaking Results call") 说明 LBR 非同行评议、非出版物，故排除 131 条。
 - 本文中的方法与数字基于会议速览所整理的公开标题和摘要，适合作为选题地图；涉及实验设定、百分比口径、对比公平性和失败案例时，仍应以论文全文与正式版本为准。
