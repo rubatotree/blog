@@ -37,7 +37,7 @@ Tech & Art & Kawaii blog, by [@rubatotree](https://github.com/rubatotree/)
 
 [[params.socialIcons]]
 name = "email"
-url = "mailto:zhuyutian@mail.ustc.edu.cn"
+url = "mailto:rubatotree@outlook.com"
 
 [[params.socialIcons]]
 name = "github"
@@ -64,6 +64,11 @@ name = "Xiaohongshu"
 icon = "xiaohongshu"
 url = "https://www.xiaohongshu.com/user/profile/653b6aeb000000000301d9ed"
 
+[[params.socialIcons]]
+name = "links"
+title = "Links"
+icon = "ellipsis"
+url = "http://rubatotree.github.io/links"
 
 [markup.typst]
 root = "./content"
