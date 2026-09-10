@@ -36,7 +36,7 @@
       author={Le, Long and Xie, Jason and Liang, William and Wang, Hung-Ju and Yang, Yue and Ma, Yecheng Jason and Vedder, Kyle and Krishna, Arjun and Jayaraman, Dinesh and Eaton, Eric},
       journal={arXiv preprint arXiv:2410.13882},
       year={2024}
-    }0
+    }
   ```,
 )
 
