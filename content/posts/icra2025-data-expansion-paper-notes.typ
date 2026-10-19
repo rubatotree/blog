@@ -8,7 +8,7 @@
   tags: (
     category: ("具身智能", "ICRA", "IROS", "ICRA 2026", "数据扩展", "论文速览")
   ),
-  draft: false,
+  draft: true,
   references: ```bib
 
   ```,
