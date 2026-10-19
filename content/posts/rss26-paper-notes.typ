@@ -8,7 +8,7 @@
   tags: (
     category: ("具身智能", "RSS", "论文概要目录")
   ),
-  draft: false,
+  draft: true,
   references: ```bib
 
   ```,

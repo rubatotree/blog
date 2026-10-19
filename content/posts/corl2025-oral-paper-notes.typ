@@ -8,7 +8,7 @@
   tags: (
     category: ("具身智能", "CoRL", "论文速览")
   ),
-  draft: false,
+  draft: true,
   references: ```bib
 
   ```,
