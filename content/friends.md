@@ -86,6 +86,15 @@ And miles to go before I sleep
 url = "https://inuebisu.cn"
 avatar = "https://inuebisu.cn/avatar.png"
 
+[[friends]]
+name = "Kokosa"
+description = """
+Astrarix Archive
+乱七八糟的个人站
+"""
+url = "https://kokosa.icu"
+avatar = "https://kokosa.icu/main/about/kokosa-avatar.6lZ74eVt.avif"
+
 +++
 
 这里是我所珍视的好朋友们的博客链接——
