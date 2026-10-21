@@ -8,7 +8,7 @@ summary = "Friends"
 name = "Vertsineu's blog"
 description = """
 月亮大人 室友
-编写了这个 blog 的底层代码 
+编写了这个 blog 的底层代码
 运维&体系结构
 """
 url = "https://blog.vertsineu.top/"
@@ -87,9 +87,9 @@ url = "https://inuebisu.cn"
 avatar = "https://inuebisu.cn/avatar.png"
 
 [[friends]]
-name = "Kokosa"
+name = "Astrarix Archive"
 description = """
-Astrarix Archive
+Kokosa
 乱七八糟的个人站
 """
 url = "https://kokosa.icu"
